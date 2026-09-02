@@ -1,0 +1,401 @@
+.submissions-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 0 32px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: none;
+
+  span {
+    display: block;
+    margin-bottom: 5px;
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  strong {
+    display: block;
+    font-size: 24px;
+    line-height: 1;
+  }
+}
+
+.summary-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f3f4f6;
+
+  mat-icon {
+    font-size: 21px;
+  }
+}
+
+.content-card {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-field {
+  width: min(360px, 100%);
+  margin-bottom: -1.25em;
+}
+
+.filter-field {
+  width: 160px;
+  margin-bottom: -1.25em;
+}
+
+.clear-button {
+  white-space: nowrap;
+}
+
+.result-bar {
+  padding: 12px 20px;
+  color: #6b7280;
+  font-size: 12px;
+  background: #fafafa;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+
+  th {
+    padding: 13px 18px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 16px 18px;
+    border-top: 1px solid #f0f0f0;
+    vertical-align: middle;
+    font-size: 13px;
+  }
+
+  tbody tr:hover {
+    background: #fafafa;
+  }
+}
+
+.student-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.student-email {
+  display: block;
+  margin-top: 4px;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.problem-name {
+  font-weight: 500;
+}
+
+.language-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  mat-icon {
+    width: 15px;
+    height: 15px;
+    font-size: 15px;
+  }
+
+  &.accepted {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  &.wrong-answer {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  &.runtime-error {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  &.time-limit {
+    background: #fffbeb;
+    color: #a16207;
+  }
+}
+
+.execution-time,
+.submitted-date {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.action-cell {
+  width: 50px;
+  text-align: right;
+}
+
+.empty-state {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+
+  > mat-icon {
+    width: 42px;
+    height: 42px;
+    color: #9ca3af;
+    font-size: 42px;
+  }
+
+  h3 {
+    margin: 14px 0 5px;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+.mobile-list {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .search-field {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .submissions-page {
+    padding: 4px 0 24px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .summary-card {
+    padding: 14px;
+  }
+
+  .summary-icon {
+    width: 36px;
+    height: 36px;
+
+    mat-icon {
+      font-size: 18px;
+    }
+  }
+
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .search-field,
+  .filter-field {
+    width: 100%;
+  }
+
+  .result-bar {
+    padding: 10px 16px;
+  }
+
+  .table-wrapper {
+    display: none;
+  }
+
+  .mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .submission-card {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+
+    span {
+      color: #9ca3af;
+      font-size: 11px;
+    }
+  }
+
+  .problem-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 4px;
+    color: #9ca3af;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .details-grid strong {
+    font-size: 13px;
+  }
+
+  .mobile-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .mobile-footer .submitted-date {
+    font-size: 10px;
+    text-align: right;
+  }
+}
+
+@media (max-width: 420px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mobile-footer .submitted-date {
+    text-align: left;
+  }
+}

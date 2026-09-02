@@ -1,0 +1,166 @@
+<div class="dashboard-page">
+
+  <section class="page-header">
+    <div>
+      <span class="eyebrow">Student Dashboard</span>
+
+      <h1>Welcome back!</h1>
+
+      <p>
+        Keep practicing and track your coding progress.
+      </p>
+    </div>
+
+    <a
+      mat-flat-button
+      class="problems-button"
+      routerLink="/student/problems"
+    >
+      <mat-icon>code</mat-icon>
+      Browse Problems
+    </a>
+  </section>
+
+
+  <section class="stats-grid">
+
+    <article
+      class="stat-card"
+      *ngFor="let stat of stats; trackBy: trackByLabel"
+    >
+      <div class="stat-icon">
+        <mat-icon>{{ stat.icon }}</mat-icon>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">
+          {{ stat.label }}
+        </span>
+
+        <strong class="stat-value">
+          {{ stat.value }}
+        </strong>
+      </div>
+    </article>
+
+  </section>
+
+
+  <section class="dashboard-section">
+
+    <div class="section-header">
+      <div>
+        <h2>Recent Submissions</h2>
+
+        <p>
+          Your latest coding submissions will appear here.
+        </p>
+      </div>
+
+      <a
+        class="view-link"
+        routerLink="/student/submissions"
+      >
+        View all
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+
+
+    <div
+      class="submissions-card"
+      *ngIf="recentSubmissions.length > 0; else noSubmissions"
+    >
+
+      <div class="submission-row submission-header">
+        <span>Problem</span>
+        <span>Status</span>
+        <span>Score</span>
+        <span>Submitted</span>
+      </div>
+
+      <div
+        class="submission-row"
+        *ngFor="
+          let submission of recentSubmissions;
+          trackBy: trackBySubmission
+        "
+      >
+        <span class="problem-name">
+          {{ submission.problem }}
+        </span>
+
+        <span
+          class="submission-status"
+          [class.accepted]="submission.status === 'ACCEPTED'"
+        >
+          {{ submission.status }}
+        </span>
+
+        <span>
+          {{ submission.score }}
+        </span>
+
+        <span>
+          {{ submission.submittedAt }}
+        </span>
+      </div>
+
+    </div>
+
+
+    <ng-template #noSubmissions>
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+
+        <h3>No submissions yet</h3>
+
+        <p>
+          Solve a problem and submit your Python solution.
+          Your recent submissions will appear here.
+        </p>
+
+        <a
+          mat-stroked-button
+          routerLink="/student/problems"
+        >
+          Start Solving
+        </a>
+
+      </div>
+
+    </ng-template>
+
+  </section>
+
+
+  <section class="practice-card">
+
+    <div class="practice-icon">
+      <mat-icon>terminal</mat-icon>
+    </div>
+
+    <div class="practice-content">
+      <h2>Ready to practice?</h2>
+
+      <p>
+        Browse published problems, choose one, and start
+        writing your Python solution.
+      </p>
+    </div>
+
+    <a
+      mat-flat-button
+      class="practice-button"
+      routerLink="/student/problems"
+    >
+      View Problems
+    </a>
+
+  </section>
+
+</div>

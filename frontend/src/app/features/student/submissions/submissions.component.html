@@ -1,0 +1,116 @@
+<div class="submissions-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Submission History</h1>
+      <p>
+        View your previous code submissions and their results.
+      </p>
+    </div>
+
+    <a
+      mat-flat-button
+      routerLink="/student/problems"
+    >
+      <mat-icon>code</mat-icon>
+      Browse Problems
+    </a>
+  </div>
+
+  <section class="submissions-card">
+
+    <div
+      class="table-container"
+      *ngIf="submissions.length > 0; else emptyState"
+    >
+      <table>
+
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Tests</th>
+            <th>Runtime</th>
+            <th>Memory</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let submission of submissions">
+
+            <td>
+              <div class="problem-cell">
+                <span class="problem-title">
+                  {{ submission.problemTitle }}
+                </span>
+
+                <span class="submission-id">
+                  Submission #{{ submission.id }}
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <span
+                class="status"
+                [ngClass]="getStatusClass(submission.status)"
+              >
+                {{ getStatusLabel(submission.status) }}
+              </span>
+            </td>
+
+            <td>
+              {{ submission.score }}/100
+            </td>
+
+            <td>
+              {{ submission.passedTests }}/{{ submission.totalTests }}
+            </td>
+
+            <td>
+              {{ submission.runtime }}s
+            </td>
+
+            <td>
+              {{ submission.memory }} MB
+            </td>
+
+            <td>
+              {{ submission.submittedAt }}
+            </td>
+
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          <mat-icon>history</mat-icon>
+        </div>
+
+        <h2>No submissions yet</h2>
+
+        <p>
+          Your submitted solutions will appear here after you
+          submit a solution to a problem.
+        </p>
+
+        <a
+          mat-flat-button
+          routerLink="/student/problems"
+        >
+          Browse Problems
+        </a>
+
+      </div>
+    </ng-template>
+
+  </section>
+
+</div>

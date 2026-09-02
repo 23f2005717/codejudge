@@ -1,0 +1,95 @@
+<div class="leaderboard-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Leaderboard</h1>
+      <p>
+        See how you rank against other students.
+      </p>
+    </div>
+  </div>
+
+  <section class="leaderboard-card">
+
+    <div
+      class="table-container"
+      *ngIf="leaderboard.length > 0; else emptyState"
+    >
+      <table>
+
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Student</th>
+            <th>Problems Solved</th>
+            <th>Submissions</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let entry of leaderboard"
+            [class.top-rank]="entry.rank <= 3"
+          >
+
+            <td>
+              <div class="rank">
+                <mat-icon *ngIf="entry.rank <= 3">
+                  emoji_events
+                </mat-icon>
+
+                <span>
+                  #{{ entry.rank }}
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <span class="student-name">
+                {{ entry.name }}
+              </span>
+            </td>
+
+            <td>
+              {{ entry.solved }}
+            </td>
+
+            <td>
+              {{ entry.submissions }}
+            </td>
+
+            <td>
+              <strong>
+                {{ entry.score }}
+              </strong>
+            </td>
+
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          <mat-icon>leaderboard</mat-icon>
+        </div>
+
+        <h2>Leaderboard is not available yet</h2>
+
+        <p>
+          Leaderboard rankings will appear here once
+          the leaderboard data is connected to the backend.
+        </p>
+
+      </div>
+
+    </ng-template>
+
+  </section>
+
+</div>

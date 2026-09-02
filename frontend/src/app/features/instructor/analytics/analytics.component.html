@@ -1,0 +1,384 @@
+<div class="analytics-page">
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Instructor</p>
+
+      <h1>Analytics</h1>
+
+      <p class="subtitle">
+        Overview of problem performance and student submissions.
+      </p>
+    </div>
+  </header>
+
+
+  <!-- Overview -->
+
+  <section class="overview-grid">
+
+    <mat-card class="overview-card">
+
+      <div class="overview-icon">
+        <mat-icon>code</mat-icon>
+      </div>
+
+      <div class="overview-content">
+        <span>Total Submissions</span>
+
+        <strong>{{ totalSubmissions }}</strong>
+
+        <small>Across all problems</small>
+      </div>
+
+    </mat-card>
+
+
+    <mat-card class="overview-card">
+
+      <div class="overview-icon">
+        <mat-icon>assignment</mat-icon>
+      </div>
+
+      <div class="overview-content">
+        <span>Total Problems</span>
+
+        <strong>{{ totalProblems }}</strong>
+
+        <small>
+          {{ publishedProblems }} currently published
+        </small>
+      </div>
+
+    </mat-card>
+
+
+    <mat-card class="overview-card">
+
+      <div class="overview-icon">
+        <mat-icon>groups</mat-icon>
+      </div>
+
+      <div class="overview-content">
+        <span>Active Students</span>
+
+        <strong>{{ activeStudents }}</strong>
+
+        <small>
+          Students with submissions
+        </small>
+      </div>
+
+    </mat-card>
+
+  </section>
+
+
+  <!-- Analytics summary -->
+
+  <section class="analytics-grid">
+
+    <!-- Submission Results -->
+
+    <mat-card class="panel-card">
+
+      <div class="panel-header">
+        <div>
+          <h2>Submission Results</h2>
+
+          <p>
+            Breakdown of submission outcomes.
+          </p>
+        </div>
+      </div>
+
+
+      <div class="status-list">
+
+        @for (
+          status of submissionStatuses;
+          track status.label
+        ) {
+
+          <div class="status-item">
+
+            <div class="status-header">
+
+              <div class="status-label">
+
+                <span
+                  class="status-dot"
+                  [class]="getStatusClass(status.label)"
+                ></span>
+
+                <strong>
+                  {{ status.label }}
+                </strong>
+
+              </div>
+
+
+              <div class="status-value">
+
+                <strong>
+                  {{ status.count }}
+                </strong>
+
+                <span>
+                  {{ status.percentage }}%
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <mat-progress-bar
+              mode="determinate"
+              [value]="status.percentage"
+            ></mat-progress-bar>
+
+          </div>
+
+        }
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Difficulty -->
+
+    <mat-card class="panel-card">
+
+      <div class="panel-header">
+        <div>
+          <h2>Problem Difficulty</h2>
+
+          <p>
+            Published problem distribution.
+          </p>
+        </div>
+      </div>
+
+
+      <div class="difficulty-list">
+
+        <div class="difficulty-row">
+
+          <div class="difficulty-info">
+            <span class="difficulty-dot easy"></span>
+            <span>Easy</span>
+          </div>
+
+          <strong>10</strong>
+
+        </div>
+
+
+        <div class="difficulty-row">
+
+          <div class="difficulty-info">
+            <span class="difficulty-dot medium"></span>
+            <span>Medium</span>
+          </div>
+
+          <strong>6</strong>
+
+        </div>
+
+
+        <div class="difficulty-row">
+
+          <div class="difficulty-info">
+            <span class="difficulty-dot hard"></span>
+            <span>Hard</span>
+          </div>
+
+          <strong>2</strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="difficulty-total">
+
+        <span>Published Problems</span>
+
+        <strong>
+          {{ publishedProblems }}
+        </strong>
+
+      </div>
+
+    </mat-card>
+
+  </section>
+
+
+  <!-- Problem Performance -->
+
+  <mat-card class="panel-card problem-performance">
+
+    <div class="panel-header">
+
+      <div>
+        <h2>Problem Performance</h2>
+
+        <p>
+          Submission and acceptance statistics for individual problems.
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- Desktop -->
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Problem</th>
+            <th>Difficulty</th>
+            <th>Submissions</th>
+            <th>Accepted</th>
+            <th>Acceptance Rate</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            problem of problemPerformance;
+            track problem.title
+          ) {
+
+            <tr>
+
+              <td>
+                <strong>
+                  {{ problem.title }}
+                </strong>
+              </td>
+
+
+              <td>
+
+                <span
+                  class="difficulty-badge"
+                  [class]="getDifficultyClass(problem.difficulty)"
+                >
+                  {{ problem.difficulty }}
+                </span>
+
+              </td>
+
+
+              <td>
+                {{ problem.submissions }}
+              </td>
+
+
+              <td>
+                {{ problem.accepted }}
+              </td>
+
+
+              <td>
+
+                <div class="rate-cell">
+
+                  <strong>
+                    {{ problem.acceptanceRate }}%
+                  </strong>
+
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="problem.acceptanceRate"
+                  ></mat-progress-bar>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- Mobile -->
+
+    <div class="mobile-problems">
+
+      @for (
+        problem of problemPerformance;
+        track problem.title
+      ) {
+
+        <div class="problem-card">
+
+          <div class="problem-card-header">
+
+            <div>
+              <h3>
+                {{ problem.title }}
+              </h3>
+
+              <span
+                class="difficulty-badge"
+                [class]="getDifficultyClass(problem.difficulty)"
+              >
+                {{ problem.difficulty }}
+              </span>
+            </div>
+
+          </div>
+
+
+          <div class="problem-metrics">
+
+            <div>
+              <span>Submissions</span>
+              <strong>{{ problem.submissions }}</strong>
+            </div>
+
+            <div>
+              <span>Accepted</span>
+              <strong>{{ problem.accepted }}</strong>
+            </div>
+
+            <div>
+              <span>Acceptance</span>
+              <strong>{{ problem.acceptanceRate }}%</strong>
+            </div>
+
+          </div>
+
+
+          <mat-progress-bar
+            mode="determinate"
+            [value]="problem.acceptanceRate"
+          ></mat-progress-bar>
+
+        </div>
+
+      }
+
+    </div>
+
+  </mat-card>
+
+</div>

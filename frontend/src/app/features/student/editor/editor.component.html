@@ -1,0 +1,232 @@
+<div class="editor-page">
+
+  <header class="page-header">
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()">
+      ← Back to Problems
+    </button>
+
+    <div
+      *ngIf="problem"
+      class="problem-heading">
+
+      <div>
+        <h1>{{ problem.title }}</h1>
+
+        <span
+          class="difficulty"
+          [class.easy]="problem.difficulty === 'easy'"
+          [class.medium]="problem.difficulty === 'medium'"
+          [class.hard]="problem.difficulty === 'hard'">
+          {{ problem.difficulty | titlecase }}
+        </span>
+      </div>
+
+    </div>
+
+  </header>
+
+  <div
+    *ngIf="loading"
+    class="state-container">
+    <p>Loading problem...</p>
+  </div>
+
+  <div
+    *ngIf="!loading && errorMessage"
+    class="state-container error-state">
+
+    <h2>Unable to load problem</h2>
+
+    <p>{{ errorMessage }}</p>
+
+    <button
+      type="button"
+      (click)="goBack()">
+      Back to Problems
+    </button>
+
+  </div>
+
+  <main
+    *ngIf="!loading && problem"
+    class="workspace">
+
+    <section class="problem-panel">
+
+      <div class="section">
+        <h2>Problem Description</h2>
+
+        <p class="description">
+          {{ problem.description }}
+        </p>
+      </div>
+
+      <div
+        *ngIf="problem.constraints"
+        class="section">
+
+        <h2>Constraints</h2>
+
+        <p class="formatted-text">
+          {{ problem.constraints }}
+        </p>
+
+      </div>
+
+      <div
+        *ngIf="problem.input_format"
+        class="section">
+
+        <h2>Input Format</h2>
+
+        <p class="formatted-text">
+          {{ problem.input_format }}
+        </p>
+
+      </div>
+
+      <div
+        *ngIf="problem.output_format"
+        class="section">
+
+        <h2>Output Format</h2>
+
+        <p class="formatted-text">
+          {{ problem.output_format }}
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="coding-panel">
+
+      <div class="editor-header">
+
+        <div>
+          <h2>Python</h2>
+          <span>Python 3</span>
+        </div>
+
+        <div class="editor-actions">
+
+          <button
+            type="button"
+            class="run-button"
+            [disabled]="isRunning || isSubmitting"
+            (click)="runCode()">
+
+            Run
+
+          </button>
+
+          <button
+            type="button"
+            class="submit-button"
+            [disabled]="isRunning || isSubmitting"
+            (click)="submitCode()">
+
+            {{ isSubmitting
+              ? 'Submitting...'
+              : 'Submit' }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <div
+        id="monaco-editor"
+        class="monaco-editor">
+      </div>
+
+      <div
+        *ngIf="result"
+        class="result-panel">
+
+        <div class="result-header">
+
+          <h2>Result</h2>
+
+          <span class="result-status">
+            {{ result.status }}
+          </span>
+
+        </div>
+
+        <div class="result-grid">
+
+          <div class="result-item">
+            <span>Score</span>
+
+            <strong>
+              {{
+                result.score === null
+                  ? '—'
+                  : result.score
+              }}
+            </strong>
+          </div>
+
+          <div class="result-item">
+            <span>Tests Passed</span>
+
+            <strong>
+              {{
+                result.passedTests === null
+                  ? '—'
+                  : result.passedTests
+              }}
+            </strong>
+          </div>
+
+          <div class="result-item">
+            <span>Runtime</span>
+
+            <strong>
+              {{
+                result.runtime === null
+                  ? '—'
+                  : result.runtime + ' ms'
+              }}
+            </strong>
+          </div>
+
+          <div class="result-item">
+            <span>Memory</span>
+
+            <strong>
+              {{
+                result.memory === null
+                  ? '—'
+                  : result.memory + ' MB'
+              }}
+            </strong>
+          </div>
+
+        </div>
+
+        <div
+          *ngIf="result.errorMessage"
+          class="result-error">
+
+          <strong>Error</strong>
+
+          <p>
+            {{ result.errorMessage }}
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

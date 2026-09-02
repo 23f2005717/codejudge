@@ -1,0 +1,108 @@
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="topbar-left">
+
+      <button
+        mat-icon-button
+        class="menu-button"
+        type="button"
+        aria-label="Toggle navigation"
+        (click)="toggleSidebar()"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <a
+        class="brand"
+        [routerLink]="user?.role === 'instructor'
+          ? '/instructor/dashboard'
+          : '/student/dashboard'"
+        (click)="closeSidebar()"
+      >
+        <span class="brand-mark">CJ</span>
+        <span class="brand-name">CodeJudge</span>
+      </a>
+
+    </div>
+
+    <div class="topbar-right">
+
+      <div class="user-info">
+        <div class="user-avatar">
+          {{ userInitial }}
+        </div>
+
+        <div class="user-details">
+          <span class="user-name">
+            {{ user?.name }}
+          </span>
+
+          <span class="user-role">
+            {{ roleLabel }}
+          </span>
+        </div>
+      </div>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="logout-button"
+        aria-label="Logout"
+        title="Logout"
+        (click)="logout()"
+      >
+        <mat-icon>logout</mat-icon>
+      </button>
+
+    </div>
+  </header>
+
+
+  <aside
+    class="sidebar"
+    [class.sidebar-open]="sidebarOpen"
+  >
+
+    <nav class="navigation">
+
+      <div class="navigation-section">
+        <span class="navigation-title">
+          Navigation
+        </span>
+
+        <a
+          *ngFor="let item of navigationItems"
+          class="navigation-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSidebar()"
+        >
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      </div>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>CodeJudge</span>
+      <span>Python Coding Platform</span>
+    </div>
+
+  </aside>
+
+
+  <div
+    class="sidebar-overlay"
+    [class.visible]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

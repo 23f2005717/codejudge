@@ -1,0 +1,280 @@
+<div class="problem-editor-page">
+
+  <header class="page-header">
+    <div class="header-left">
+      <a
+        mat-icon-button
+        routerLink="/instructor/problems"
+        aria-label="Back to problems"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+
+      <div>
+        <p class="eyebrow">Problem Management</p>
+        <h1>{{ pageTitle }}</h1>
+        <p class="subtitle">
+          {{ isEditMode
+            ? 'Update the problem details and publishing status.'
+            : 'Create a new programming problem for students.' }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  @if (loadError) {
+    <mat-card class="error-card">
+      <mat-icon>error_outline</mat-icon>
+
+      <div>
+        <h3>Problem not found</h3>
+        <p>
+          The requested problem could not be loaded.
+        </p>
+      </div>
+
+      <a
+        mat-button
+        routerLink="/instructor/problems"
+      >
+        Back to Problems
+      </a>
+    </mat-card>
+  }
+
+  @if (!loadError) {
+    <form
+      class="problem-form"
+      [formGroup]="form"
+      (ngSubmit)="saveProblem()"
+    >
+
+      <div class="form-main">
+
+        <mat-card class="form-card">
+          <div class="card-heading">
+            <div>
+              <h2>Problem Details</h2>
+              <p>Define the basic information students will see.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+
+            <mat-form-field
+              appearance="outline"
+              class="full-width"
+            >
+              <mat-label>Problem Title</mat-label>
+
+              <input
+                matInput
+                formControlName="title"
+                placeholder="e.g. Two Sum"
+              />
+
+              @if (form.controls.title.hasError('required')) {
+                <mat-error>
+                  Problem title is required.
+                </mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+            >
+              <mat-label>Difficulty</mat-label>
+
+              <mat-select formControlName="difficulty">
+                @for (difficulty of difficulties; track difficulty) {
+                  <mat-option [value]="difficulty">
+                    {{ difficulty }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              class="full-width"
+            >
+              <mat-label>Description</mat-label>
+
+              <textarea
+                matInput
+                formControlName="description"
+                rows="7"
+                placeholder="Describe the problem clearly..."
+              ></textarea>
+
+              @if (form.controls.description.hasError('required')) {
+                <mat-error>
+                  Description is required.
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-card>
+
+        <mat-card class="form-card">
+          <div class="card-heading">
+            <div>
+              <h2>Input & Output</h2>
+              <p>Explain the expected input and output format.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+
+            <mat-form-field
+              appearance="outline"
+            >
+              <mat-label>Input Format</mat-label>
+
+              <textarea
+                matInput
+                formControlName="inputFormat"
+                rows="8"
+                placeholder="Describe the input format..."
+              ></textarea>
+
+              @if (form.controls.inputFormat.hasError('required')) {
+                <mat-error>
+                  Input format is required.
+                </mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+            >
+              <mat-label>Output Format</mat-label>
+
+              <textarea
+                matInput
+                formControlName="outputFormat"
+                rows="8"
+                placeholder="Describe the expected output..."
+              ></textarea>
+
+              @if (form.controls.outputFormat.hasError('required')) {
+                <mat-error>
+                  Output format is required.
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-card>
+
+        <mat-card class="form-card">
+          <div class="card-heading">
+            <div>
+              <h2>Constraints</h2>
+              <p>Specify the limits students should consider.</p>
+            </div>
+          </div>
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width"
+          >
+            <mat-label>Constraints</mat-label>
+
+            <textarea
+              matInput
+              formControlName="constraints"
+              rows="7"
+              placeholder="Example:
+1 <= n <= 100000
+-10^9 <= values[i] <= 10^9"
+            ></textarea>
+
+            @if (form.controls.constraints.hasError('required')) {
+              <mat-error>
+                Constraints are required.
+              </mat-error>
+            }
+          </mat-form-field>
+        </mat-card>
+
+      </div>
+
+      <aside class="form-sidebar">
+
+        <mat-card class="status-card">
+          <div class="card-heading">
+            <div>
+              <h2>Publishing</h2>
+              <p>Control whether students can access this problem.</p>
+            </div>
+          </div>
+
+          <div class="publish-control">
+            <div>
+              <strong>
+                {{ form.controls.published.value
+                  ? 'Published'
+                  : 'Draft' }}
+              </strong>
+
+              <span>
+                {{ form.controls.published.value
+                  ? 'Students can access this problem.'
+                  : 'Only instructors can access this problem.' }}
+              </span>
+            </div>
+
+            <mat-slide-toggle
+              formControlName="published"
+              aria-label="Published status"
+            ></mat-slide-toggle>
+          </div>
+        </mat-card>
+
+        <mat-card class="tips-card">
+          <div class="tips-icon">
+            <mat-icon>lightbulb</mat-icon>
+          </div>
+
+          <h3>Before publishing</h3>
+
+          <ul>
+            <li>Make the problem statement clear.</li>
+            <li>Verify input and output formats.</li>
+            <li>Check that constraints are accurate.</li>
+            <li>Add test cases before publishing.</li>
+          </ul>
+        </mat-card>
+
+      </aside>
+
+    </form>
+
+    @if (saveError) {
+      <div class="form-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ saveError }}</span>
+      </div>
+    }
+
+    <div class="form-actions">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        mat-flat-button
+        class="save-button"
+        (click)="saveProblem()"
+      >
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        {{ actionLabel }}
+      </button>
+    </div>
+  }
+</div>

@@ -1,0 +1,305 @@
+<div class="dashboard">
+
+  <!-- Page header -->
+  <section class="page-header">
+
+    <div class="header-content">
+      <p class="eyebrow">Instructor</p>
+
+      <h1>Dashboard</h1>
+
+      <p class="subtitle">
+        Overview of your problems and student submissions.
+      </p>
+    </div>
+
+    <a
+      mat-flat-button
+      color="primary"
+      routerLink="/instructor/problems">
+
+      <mat-icon>add</mat-icon>
+      Create Problem
+
+    </a>
+
+  </section>
+
+
+  <!-- Statistics cards -->
+  <section class="stats-grid">
+
+    @for (stat of stats; track stat.label) {
+
+      <mat-card class="stat-card">
+
+        <div class="stat-icon">
+          <mat-icon>{{ stat.icon }}</mat-icon>
+        </div>
+
+        <div class="stat-content">
+
+          <span class="stat-label">
+            {{ stat.label }}
+          </span>
+
+          <strong>
+            {{ stat.value }}
+          </strong>
+
+          <span class="stat-description">
+            {{ stat.description }}
+          </span>
+
+        </div>
+
+      </mat-card>
+
+    }
+
+  </section>
+
+
+  <!-- Dashboard panels -->
+  <section class="dashboard-grid">
+
+    <!-- Recent problems -->
+    <mat-card class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Recent Problems</h2>
+
+          <p>
+            Recently created problems.
+          </p>
+        </div>
+
+        <a
+          mat-button
+          routerLink="/instructor/problems">
+
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+
+        </a>
+
+      </div>
+
+
+      <div class="problem-list">
+
+        @for (problem of recentProblems; track problem.id) {
+
+          <div class="problem-row">
+
+            <div class="problem-info">
+
+              <div class="problem-title">
+                {{ problem.title }}
+              </div>
+
+              <div class="problem-meta">
+
+                <span
+                  class="difficulty"
+                  [class]="getDifficultyClass(problem.difficulty)">
+
+                  {{ problem.difficulty }}
+
+                </span>
+
+                <span class="submission-count">
+                  {{ problem.submissions }} submissions
+                </span>
+
+              </div>
+
+            </div>
+
+
+            @if (problem.published) {
+
+              <span class="status published">
+                Published
+              </span>
+
+            } @else {
+
+              <span class="status draft">
+                Draft
+              </span>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Submission summary -->
+    <mat-card class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Submission Summary</h2>
+
+          <p>
+            Overall submission results.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="submission-list">
+
+        @for (item of submissionSummary; track item.label) {
+
+          <div class="submission-item">
+
+            <div class="submission-header">
+
+              <span>
+                {{ item.label }}
+              </span>
+
+              <strong>
+                {{ item.value }}
+              </strong>
+
+            </div>
+
+            <div class="progress-track">
+
+              <div
+                class="progress-bar"
+                [style.width.%]="item.percentage">
+              </div>
+
+            </div>
+
+            <span class="percentage">
+              {{ item.percentage }}%
+            </span>
+
+          </div>
+
+        }
+
+      </div>
+
+    </mat-card>
+
+  </section>
+
+
+  <!-- Quick actions -->
+  <section class="quick-actions">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Quick Actions</h2>
+
+        <p>
+          Common instructor tasks.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="action-grid">
+
+      <a
+        class="action-card"
+        routerLink="/instructor/problems">
+
+        <span class="action-icon">
+          <mat-icon>library_books</mat-icon>
+        </span>
+
+        <span class="action-content">
+
+          <strong>
+            Manage Problems
+          </strong>
+
+          <small>
+            Create, edit and publish problems.
+          </small>
+
+        </span>
+
+        <mat-icon class="action-arrow">
+          arrow_forward
+        </mat-icon>
+
+      </a>
+
+
+      <a
+        class="action-card"
+        routerLink="/instructor/submissions">
+
+        <span class="action-icon">
+          <mat-icon>assignment</mat-icon>
+        </span>
+
+        <span class="action-content">
+
+          <strong>
+            View Submissions
+          </strong>
+
+          <small>
+            Review student submissions and results.
+          </small>
+
+        </span>
+
+        <mat-icon class="action-arrow">
+          arrow_forward
+        </mat-icon>
+
+      </a>
+
+
+      <a
+        class="action-card"
+        routerLink="/instructor/statistics">
+
+        <span class="action-icon">
+          <mat-icon>bar_chart</mat-icon>
+        </span>
+
+        <span class="action-content">
+
+          <strong>
+            View Statistics
+          </strong>
+
+          <small>
+            See problem and submission statistics.
+          </small>
+
+        </span>
+
+        <mat-icon class="action-arrow">
+          arrow_forward
+        </mat-icon>
+
+      </a>
+
+    </div>
+
+  </section>
+
+</div>

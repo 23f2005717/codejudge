@@ -1,0 +1,456 @@
+.analytics-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 0 32px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+
+/* Overview */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.overview-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: none;
+}
+
+.overview-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+  background: #f3f4f6;
+
+  mat-icon {
+    font-size: 21px;
+  }
+}
+
+.overview-content {
+  min-width: 0;
+
+  span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  strong {
+    display: block;
+    margin: 4px 0;
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  small {
+    color: #9ca3af;
+    font-size: 11px;
+  }
+}
+
+
+/* Analytics cards */
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.panel-card {
+  padding: 22px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: none;
+}
+
+.panel-header {
+  margin-bottom: 22px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+  }
+
+  p {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+
+/* Submission status */
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  strong {
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+
+  &.accepted {
+    background: #059669;
+  }
+
+  &.wrong-answer {
+    background: #d97706;
+  }
+
+  &.runtime-error {
+    background: #dc2626;
+  }
+
+  &.time-limit {
+    background: #ca8a04;
+  }
+}
+
+.status-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  strong {
+    font-size: 13px;
+  }
+
+  span {
+    color: #9ca3af;
+    font-size: 12px;
+  }
+}
+
+
+/* Difficulty */
+
+.difficulty-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.difficulty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  > strong {
+    font-size: 14px;
+  }
+}
+
+.difficulty-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  span:last-child {
+    font-size: 13px;
+  }
+}
+
+.difficulty-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+
+  &.easy {
+    background: #059669;
+  }
+
+  &.medium {
+    background: #d97706;
+  }
+
+  &.hard {
+    background: #dc2626;
+  }
+}
+
+.difficulty-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 24px;
+  padding-top: 16px;
+
+  border-top: 1px solid #e5e7eb;
+
+  span {
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+}
+
+
+/* Problem performance */
+
+.problem-performance {
+  overflow: hidden;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 800px;
+
+  border-collapse: collapse;
+
+  th {
+    padding: 13px 16px;
+
+    background: #f9fafb;
+
+    color: #6b7280;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 0.04em;
+
+    text-align: left;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 16px;
+
+    border-top: 1px solid #f0f0f0;
+
+    vertical-align: middle;
+
+    font-size: 13px;
+  }
+
+  tbody tr:hover {
+    background: #fafafa;
+  }
+}
+
+.difficulty-badge {
+  display: inline-block;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  &.easy {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  &.medium {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  &.hard {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+}
+
+.rate-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 180px;
+
+  strong {
+    width: 42px;
+    flex-shrink: 0;
+
+    font-size: 13px;
+  }
+
+  mat-progress-bar {
+    flex: 1;
+  }
+}
+
+
+/* Mobile */
+
+.mobile-problems {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .overview-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .analytics-page {
+    padding: 4px 0 24px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-card,
+  .panel-card {
+    padding: 18px;
+  }
+
+  .table-wrapper {
+    display: none;
+  }
+
+  .mobile-problems {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .problem-card {
+    padding: 15px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+  }
+
+  .problem-card-header {
+    margin-bottom: 15px;
+
+    h3 {
+      margin: 0 0 8px;
+
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  }
+
+  .problem-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+
+    margin-bottom: 14px;
+
+    span {
+      display: block;
+
+      margin-bottom: 4px;
+
+      color: #9ca3af;
+
+      font-size: 10px;
+      font-weight: 600;
+
+      text-transform: uppercase;
+    }
+
+    strong {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .problem-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

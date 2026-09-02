@@ -1,0 +1,213 @@
+<div class="problems-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Problems</h1>
+      <p>
+        Choose a problem and start solving it with Python.
+      </p>
+    </div>
+  </div>
+
+  <section class="filters-card">
+
+    <mat-form-field
+      appearance="outline"
+      class="search-field"
+    >
+      <mat-label>Search problems</mat-label>
+
+      <mat-icon matPrefix>
+        search
+      </mat-icon>
+
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search by problem name"
+      />
+
+      <button
+        *ngIf="searchTerm"
+        mat-icon-button
+        matSuffix
+        type="button"
+        aria-label="Clear search"
+        (click)="searchTerm = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="outline"
+      class="difficulty-field"
+    >
+      <mat-label>Difficulty</mat-label>
+
+      <mat-select
+        [(ngModel)]="selectedDifficulty"
+      >
+        <mat-option value="all">
+          All difficulties
+        </mat-option>
+
+        <mat-option value="easy">
+          Easy
+        </mat-option>
+
+        <mat-option value="medium">
+          Medium
+        </mat-option>
+
+        <mat-option value="hard">
+          Hard
+        </mat-option>
+      </mat-select>
+
+    </mat-form-field>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="clear-button"
+      (click)="clearFilters()"
+      [disabled]="
+        !searchTerm &&
+        selectedDifficulty === 'all'
+      "
+    >
+      Clear
+    </button>
+
+  </section>
+
+  <div
+    class="loading-state"
+    *ngIf="isLoading"
+  >
+    <mat-spinner diameter="40"></mat-spinner>
+
+    <p>Loading problems...</p>
+  </div>
+
+  <div
+    class="error-state"
+    *ngIf="!isLoading && errorMessage"
+  >
+    <mat-icon>error_outline</mat-icon>
+
+    <h2>Unable to load problems</h2>
+
+    <p>{{ errorMessage }}</p>
+
+    <button
+      mat-flat-button
+      type="button"
+      (click)="loadProblems()"
+    >
+      Try Again
+    </button>
+  </div>
+
+  <section
+    class="problems-grid"
+    *ngIf="
+      !isLoading &&
+      !errorMessage &&
+      filteredProblems.length > 0
+    "
+  >
+
+    <article
+      class="problem-card"
+      *ngFor="let problem of filteredProblems"
+    >
+
+      <div class="problem-card-header">
+
+        <span
+          class="difficulty"
+          [class.easy]="problem.difficulty === 'easy'"
+          [class.medium]="problem.difficulty === 'medium'"
+          [class.hard]="problem.difficulty === 'hard'"
+        >
+          {{ getDifficultyLabel(problem.difficulty) }}
+        </span>
+
+      </div>
+
+      <h2>
+        {{ problem.title }}
+      </h2>
+
+      <p class="description">
+        {{ problem.description }}
+      </p>
+
+      <div class="problem-card-footer">
+
+        <span class="problem-id">
+          Problem #{{ problem.id }}
+        </span>
+
+        <a
+          mat-flat-button
+          [routerLink]="[
+            '/student/problems',
+            problem.id
+          ]"
+        >
+          Solve
+
+          <mat-icon>
+            arrow_forward
+          </mat-icon>
+        </a>
+
+      </div>
+
+    </article>
+
+  </section>
+
+  <div
+    class="empty-state"
+    *ngIf="
+      !isLoading &&
+      !errorMessage &&
+      filteredProblems.length === 0
+    "
+  >
+
+    <div class="empty-icon">
+      <mat-icon>search_off</mat-icon>
+    </div>
+
+    <h2>No problems found</h2>
+
+    <p *ngIf="problems.length > 0">
+      Try changing your search or difficulty filter.
+    </p>
+
+    <p *ngIf="problems.length === 0">
+      There are no published problems available yet.
+    </p>
+
+    <button
+      *ngIf="
+        searchTerm ||
+        selectedDifficulty !== 'all'
+      "
+      mat-stroked-button
+      type="button"
+      (click)="clearFilters()"
+    >
+      Clear Filters
+    </button>
+
+  </div>
+
+</div>

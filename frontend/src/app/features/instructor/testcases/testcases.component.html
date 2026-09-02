@@ -1,0 +1,313 @@
+<div class="testcases-page">
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Instructor</p>
+      <h1>Test Case Management</h1>
+      <p class="subtitle">
+        Create and manage input/output cases used to evaluate submissions.
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      class="create-button"
+    >
+      <mat-icon>add</mat-icon>
+      Add Test Case
+    </button>
+  </header>
+
+  <section class="summary-grid">
+
+    <mat-card class="summary-card">
+      <div class="summary-icon">
+        <mat-icon>fact_check</mat-icon>
+      </div>
+
+      <div>
+        <span>Total Test Cases</span>
+        <strong>{{ testCases.length }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <div class="summary-icon">
+        <mat-icon>visibility</mat-icon>
+      </div>
+
+      <div>
+        <span>Visible</span>
+        <strong>{{ visibleCount }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <div class="summary-icon">
+        <mat-icon>visibility_off</mat-icon>
+      </div>
+
+      <div>
+        <span>Hidden</span>
+        <strong>{{ hiddenCount }}</strong>
+      </div>
+    </mat-card>
+
+  </section>
+
+  <mat-card class="content-card">
+
+    <div class="toolbar">
+
+      <mat-form-field
+        appearance="outline"
+        class="search-field"
+      >
+        <mat-label>Search test cases</mat-label>
+
+        <mat-icon matPrefix>search</mat-icon>
+
+        <input
+          matInput
+          [(ngModel)]="searchTerm"
+          placeholder="Search by problem or input..."
+        />
+
+        @if (searchTerm) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Clear search"
+            (click)="clearSearch()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <span class="result-count">
+        {{ filteredTestCases.length }}
+        {{ filteredTestCases.length === 1 ? 'test case' : 'test cases' }}
+      </span>
+
+    </div>
+
+    <!-- Desktop table -->
+    <div class="table-wrapper">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Input</th>
+            <th>Expected Output</th>
+            <th>Visibility</th>
+            <th>Created</th>
+            <th class="actions-column"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (testCase of filteredTestCases; track testCase.id) {
+            <tr>
+
+              <td>
+                <div class="problem-name">
+                  {{ testCase.problem }}
+                </div>
+                <span class="case-id">
+                  Test Case #{{ testCase.id }}
+                </span>
+              </td>
+
+              <td>
+                <pre>{{ testCase.input }}</pre>
+              </td>
+
+              <td>
+                <pre>{{ testCase.expectedOutput }}</pre>
+              </td>
+
+              <td>
+                @if (testCase.hidden) {
+                  <span class="visibility-badge hidden">
+                    <mat-icon>visibility_off</mat-icon>
+                    Hidden
+                  </span>
+                } @else {
+                  <span class="visibility-badge visible">
+                    <mat-icon>visibility</mat-icon>
+                    Visible
+                  </span>
+                }
+              </td>
+
+              <td class="date-cell">
+                {{ testCase.createdAt }}
+              </td>
+
+              <td class="actions-column">
+
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="testCaseMenu"
+                  aria-label="Test case actions"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <mat-menu #testCaseMenu="matMenu">
+
+                  <button
+                    mat-menu-item
+                    (click)="toggleVisibility(testCase)"
+                  >
+                    <mat-icon>
+                      {{ testCase.hidden ? 'visibility' : 'visibility_off' }}
+                    </mat-icon>
+
+                    <span>
+                      {{ testCase.hidden ? 'Make Visible' : 'Hide' }}
+                    </span>
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    (click)="deleteTestCase(testCase)"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                    <span>Delete</span>
+                  </button>
+
+                </mat-menu>
+
+              </td>
+
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredTestCases.length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h3>No test cases found</h3>
+          <p>
+            Try changing your search term.
+          </p>
+
+          <button
+            mat-stroked-button
+            (click)="clearSearch()"
+          >
+            Clear Search
+          </button>
+        </div>
+      }
+
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="mobile-list">
+
+      @for (testCase of filteredTestCases; track testCase.id) {
+
+        <mat-card class="testcase-card">
+
+          <div class="mobile-card-header">
+
+            <div>
+              <h3>{{ testCase.problem }}</h3>
+              <span>Test Case #{{ testCase.id }}</span>
+            </div>
+
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="mobileTestCaseMenu"
+              aria-label="Test case actions"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #mobileTestCaseMenu="matMenu">
+
+              <button
+                mat-menu-item
+                (click)="toggleVisibility(testCase)"
+              >
+                <mat-icon>
+                  {{ testCase.hidden ? 'visibility' : 'visibility_off' }}
+                </mat-icon>
+
+                <span>
+                  {{ testCase.hidden ? 'Make Visible' : 'Hide' }}
+                </span>
+              </button>
+
+              <button
+                mat-menu-item
+                (click)="deleteTestCase(testCase)"
+              >
+                <mat-icon>delete_outline</mat-icon>
+                <span>Delete</span>
+              </button>
+
+            </mat-menu>
+
+          </div>
+
+          <div class="mobile-section">
+            <span class="section-label">Input</span>
+            <pre>{{ testCase.input }}</pre>
+          </div>
+
+          <div class="mobile-section">
+            <span class="section-label">Expected Output</span>
+            <pre>{{ testCase.expectedOutput }}</pre>
+          </div>
+
+          <div class="mobile-card-footer">
+
+            @if (testCase.hidden) {
+              <span class="visibility-badge hidden">
+                <mat-icon>visibility_off</mat-icon>
+                Hidden
+              </span>
+            } @else {
+              <span class="visibility-badge visible">
+                <mat-icon>visibility</mat-icon>
+                Visible
+              </span>
+            }
+
+            <span class="date-cell">
+              {{ testCase.createdAt }}
+            </span>
+
+          </div>
+
+        </mat-card>
+
+      }
+
+      @if (filteredTestCases.length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h3>No test cases found</h3>
+          <p>Try changing your search term.</p>
+
+          <button
+            mat-stroked-button
+            (click)="clearSearch()"
+          >
+            Clear Search
+          </button>
+        </div>
+      }
+
+    </div>
+
+  </mat-card>
+
+</div>
