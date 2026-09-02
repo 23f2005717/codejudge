@@ -5,7 +5,11 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterModule
+} from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,15 +19,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
-interface ProblemFormData {
-  title: string;
-  description: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  inputFormat: string;
-  outputFormat: string;
-  constraints: string;
-  published: boolean;
-}
+import {
+  ProblemDifficulty,
+  ProblemService
+} from '../../../core/services/problem.service';
 
 @Component({
   selector: 'app-create-edit-problem',
@@ -47,94 +46,107 @@ export class CreateEditProblemComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly problemService = inject(ProblemService);
 
   isEditMode = false;
   problemId: number | null = null;
-  loadError = false;
+
+  isLoading = false;
+  isSaving = false;
+
+  loadError = '';
   saveError = '';
 
-  readonly difficulties: ProblemFormData['difficulty'][] = [
+  readonly difficulties = [
     'Easy',
     'Medium',
     'Hard'
-  ];
+  ] as const;
 
   readonly form = this.fb.nonNullable.group({
-    title: ['', [Validators.required]],
-    description: ['', [Validators.required]],
-    difficulty: ['Easy' as ProblemFormData['difficulty'], Validators.required],
-    inputFormat: ['', [Validators.required]],
-    outputFormat: ['', [Validators.required]],
-    constraints: ['', [Validators.required]],
+    title: ['', Validators.required],
+    description: ['', Validators.required],
+    difficulty: [
+      'Easy' as 'Easy' | 'Medium' | 'Hard',
+      Validators.required
+    ],
+    inputFormat: ['', Validators.required],
+    outputFormat: ['', Validators.required],
+    constraints: ['', Validators.required],
     published: [false]
   });
-
-  private readonly placeholderProblems: Record<number, ProblemFormData> = {
-    1: {
-      title: 'Two Sum',
-      description:
-        'Given an array of integers and a target value, find two numbers whose sum equals the target.',
-      difficulty: 'Easy',
-      inputFormat:
-        'The first line contains n and target. The second line contains n integers.',
-      outputFormat:
-        'Print the indices of the two numbers whose sum equals the target.',
-      constraints:
-        '2 <= n <= 100000\n-10^9 <= values[i] <= 10^9',
-      published: true
-    },
-    2: {
-      title: 'Binary Search',
-      description:
-        'Given a sorted array of integers, find the position of a target value.',
-      difficulty: 'Easy',
-      inputFormat:
-        'The first line contains n and target. The second line contains n sorted integers.',
-      outputFormat:
-        'Print the index of the target value, or -1 if it does not exist.',
-      constraints:
-        '1 <= n <= 100000\nArray elements are sorted in ascending order.',
-      published: true
-    },
-    3: {
-      title: 'Longest Substring Without Repeating Characters',
-      description:
-        'Find the length of the longest substring that contains no repeated characters.',
-      difficulty: 'Medium',
-      inputFormat: 'The input contains a single string.',
-      outputFormat:
-        'Print the length of the longest substring without repeated characters.',
-      constraints:
-        '1 <= length of string <= 100000',
-      published: true
-    }
-  };
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
-    if (id) {
-      this.isEditMode = true;
-      this.problemId = Number(id);
-      this.loadProblem();
-    }
-  }
-
-  get pageTitle(): string {
-    return this.isEditMode ? 'Edit Problem' : 'Create Problem';
-  }
-
-  get actionLabel(): string {
-    return this.isEditMode ? 'Save Changes' : 'Create Problem';
-  }
-
-  private loadProblem(): void {
-    if (!this.problemId || !this.placeholderProblems[this.problemId]) {
-      this.loadError = true;
+    if (!id) {
       return;
     }
 
-    this.form.patchValue(this.placeholderProblems[this.problemId]);
+    const problemId = Number(id);
+
+    if (Number.isNaN(problemId)) {
+      this.loadError = 'Invalid problem ID.';
+      return;
+    }
+
+    this.isEditMode = true;
+    this.problemId = problemId;
+
+    this.loadProblem(problemId);
+  }
+
+  get pageTitle(): string {
+    return this.isEditMode
+      ? 'Edit Problem'
+      : 'Create Problem';
+  }
+
+  get actionLabel(): string {
+    if (this.isSaving) {
+      return 'Saving...';
+    }
+
+    return this.isEditMode
+      ? 'Save Changes'
+      : 'Create Problem';
+  }
+
+  private loadProblem(id: number): void {
+    this.isLoading = true;
+    this.loadError = '';
+
+    this.problemService.getProblem(id).subscribe({
+      next: (response) => {
+        const problem = response.problem;
+
+        this.form.patchValue({
+          title: problem.title,
+          description: problem.description,
+          difficulty: this.toDisplayDifficulty(
+            problem.difficulty
+          ),
+          inputFormat: problem.input_format ?? '',
+          outputFormat: problem.output_format ?? '',
+          constraints: problem.constraints ?? '',
+          published: problem.is_published
+        });
+
+        this.isLoading = false;
+      },
+
+      error: (error) => {
+        console.error(
+          'Failed to load problem:',
+          error
+        );
+
+        this.loadError =
+          'Unable to load the problem. Please try again.';
+
+        this.isLoading = false;
+      }
+    });
   }
 
   saveProblem(): void {
@@ -142,23 +154,137 @@ export class CreateEditProblemComponent implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.saveError = 'Please complete all required fields.';
+
+      this.saveError =
+        'Please complete all required fields.';
+
       return;
     }
 
-    const problem = this.form.getRawValue();
+    const formValue = this.form.getRawValue();
 
-    // Temporary frontend-only save.
-    // This will be replaced with ProblemService API integration.
-    console.log(
-      this.isEditMode ? 'Updating problem:' : 'Creating problem:',
-      problem
-    );
+    const payload = {
+      title: formValue.title.trim(),
+      description: formValue.description.trim(),
+      difficulty: this.toApiDifficulty(
+        formValue.difficulty
+      ),
+      input_format: formValue.inputFormat.trim(),
+      output_format: formValue.outputFormat.trim(),
+      constraints: formValue.constraints.trim(),
+      is_published: formValue.published
+    };
 
-    this.router.navigate(['/instructor/problems']);
+    this.isSaving = true;
+
+    if (
+      this.isEditMode &&
+      this.problemId !== null
+    ) {
+      this.updateProblem(
+        this.problemId,
+        payload
+      );
+
+      return;
+    }
+
+    this.createProblem(payload);
+  }
+
+  private createProblem(payload: {
+    title: string;
+    description: string;
+    difficulty: ProblemDifficulty;
+    input_format: string;
+    output_format: string;
+    constraints: string;
+    is_published: boolean;
+  }): void {
+    this.problemService
+      .createProblem(payload)
+      .subscribe({
+        next: () => {
+          this.router.navigate([
+            '/instructor/problems'
+          ]);
+        },
+
+        error: (error) => {
+          console.error(
+            'Failed to create problem:',
+            error
+          );
+
+          this.saveError =
+            error?.error?.message ??
+            'Unable to create the problem. Please try again.';
+
+          this.isSaving = false;
+        }
+      });
+  }
+
+  private updateProblem(
+    id: number,
+    payload: {
+      title: string;
+      description: string;
+      difficulty: ProblemDifficulty;
+      input_format: string;
+      output_format: string;
+      constraints: string;
+      is_published: boolean;
+    }
+  ): void {
+    this.problemService
+      .updateProblem(id, payload)
+      .subscribe({
+        next: () => {
+          this.router.navigate([
+            '/instructor/problems'
+          ]);
+        },
+
+        error: (error) => {
+          console.error(
+            'Failed to update problem:',
+            error
+          );
+
+          this.saveError =
+            error?.error?.message ??
+            'Unable to update the problem. Please try again.';
+
+          this.isSaving = false;
+        }
+      });
   }
 
   cancel(): void {
-    this.router.navigate(['/instructor/problems']);
+    this.router.navigate([
+      '/instructor/problems'
+    ]);
+  }
+
+  private toApiDifficulty(
+    difficulty: 'Easy' | 'Medium' | 'Hard'
+  ): ProblemDifficulty {
+    return difficulty.toLowerCase() as ProblemDifficulty;
+  }
+
+  private toDisplayDifficulty(
+    difficulty: string
+  ): 'Easy' | 'Medium' | 'Hard' {
+    switch (difficulty.toLowerCase()) {
+      case 'medium':
+        return 'Medium';
+
+      case 'hard':
+        return 'Hard';
+
+      default:
+        return 'Easy';
+    }
   }
 }

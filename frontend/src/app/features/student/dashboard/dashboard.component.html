@@ -21,146 +21,164 @@
     </a>
   </section>
 
+  <div
+    class="loading-state"
+    *ngIf="isLoading"
+  >
+    <mat-spinner diameter="36"></mat-spinner>
 
-  <section class="stats-grid">
+    <p>Loading your dashboard...</p>
+  </div>
 
-    <article
-      class="stat-card"
-      *ngFor="let stat of stats; trackBy: trackByLabel"
-    >
-      <div class="stat-icon">
-        <mat-icon>{{ stat.icon }}</mat-icon>
-      </div>
-
-      <div class="stat-content">
-        <span class="stat-label">
-          {{ stat.label }}
-        </span>
-
-        <strong class="stat-value">
-          {{ stat.value }}
-        </strong>
-      </div>
-    </article>
-
-  </section>
-
-
-  <section class="dashboard-section">
-
-    <div class="section-header">
-      <div>
-        <h2>Recent Submissions</h2>
-
-        <p>
-          Your latest coding submissions will appear here.
-        </p>
-      </div>
-
-      <a
-        class="view-link"
-        routerLink="/student/submissions"
-      >
-        View all
-        <mat-icon>arrow_forward</mat-icon>
-      </a>
+  <div
+    class="error-state"
+    *ngIf="!isLoading && errorMessage"
+  >
+    <div class="error-icon">
+      <mat-icon>error_outline</mat-icon>
     </div>
 
+    <div>
+      <h3>Unable to load dashboard</h3>
 
-    <div
-      class="submissions-card"
-      *ngIf="recentSubmissions.length > 0; else noSubmissions"
-    >
+      <p>{{ errorMessage }}</p>
 
-      <div class="submission-row submission-header">
-        <span>Problem</span>
-        <span>Status</span>
-        <span>Score</span>
-        <span>Submitted</span>
-      </div>
-
-      <div
-        class="submission-row"
-        *ngFor="
-          let submission of recentSubmissions;
-          trackBy: trackBySubmission
-        "
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="loadDashboard()"
       >
-        <span class="problem-name">
-          {{ submission.problem }}
-        </span>
-
-        <span
-          class="submission-status"
-          [class.accepted]="submission.status === 'ACCEPTED'"
-        >
-          {{ submission.status }}
-        </span>
-
-        <span>
-          {{ submission.score }}
-        </span>
-
-        <span>
-          {{ submission.submittedAt }}
-        </span>
-      </div>
-
+        <mat-icon>refresh</mat-icon>
+        Try Again
+      </button>
     </div>
+  </div>
 
+  <ng-container *ngIf="!isLoading && !errorMessage">
 
-    <ng-template #noSubmissions>
+    <section class="stats-grid">
 
-      <div class="empty-state">
-
-        <div class="empty-icon">
-          <mat-icon>assignment</mat-icon>
+      <article
+        class="stat-card"
+        *ngFor="let stat of stats; trackBy: trackByLabel"
+      >
+        <div class="stat-icon">
+          <mat-icon>{{ stat.icon }}</mat-icon>
         </div>
 
-        <h3>No submissions yet</h3>
+        <div class="stat-content">
+          <span class="stat-label">
+            {{ stat.label }}
+          </span>
 
-        <p>
-          Solve a problem and submit your Python solution.
-          Your recent submissions will appear here.
-        </p>
+          <strong class="stat-value">
+            {{ stat.value }}
+          </strong>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="dashboard-section">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Recent Submissions</h2>
+
+          <p>
+            Your latest coding submissions and results.
+          </p>
+        </div>
 
         <a
-          mat-stroked-button
-          routerLink="/student/problems"
+          class="view-link"
+          routerLink="/student/submissions"
         >
-          Start Solving
+          View all
+
+          <mat-icon>arrow_forward</mat-icon>
         </a>
 
       </div>
 
-    </ng-template>
+      <div
+        class="submissions-card"
+        *ngIf="recentSubmissions.length > 0; else noSubmissions"
+      >
 
-  </section>
+        <div class="submission-row submission-header">
+          <span>Problem</span>
+          <span>Status</span>
+          <span>Score</span>
+          <span>Submitted</span>
+        </div>
 
+        <div
+          class="submission-row"
+          *ngFor="
+            let submission of recentSubmissions;
+            trackBy: trackBySubmission
+          "
+        >
 
-  <section class="practice-card">
+          <a
+            class="problem-name"
+            [routerLink]="[
+              '/student/problems',
+              submission.problemId
+            ]"
+          >
+            {{ submission.problem }}
+          </a>
 
-    <div class="practice-icon">
-      <mat-icon>terminal</mat-icon>
-    </div>
+          <span
+            class="submission-status"
+            [ngClass]="getStatusClass(submission.status)"
+          >
+            {{ getStatusLabel(submission.status) }}
+          </span>
 
-    <div class="practice-content">
-      <h2>Ready to practice?</h2>
+          <span class="score">
+            {{ submission.score }}/100
+          </span>
 
-      <p>
-        Browse published problems, choose one, and start
-        writing your Python solution.
-      </p>
-    </div>
+          <span class="submitted-date">
+            {{ submission.submittedAt }}
+          </span>
 
-    <a
-      mat-flat-button
-      class="practice-button"
-      routerLink="/student/problems"
-    >
-      View Problems
-    </a>
+        </div>
 
-  </section>
+      </div>
+
+      <ng-template #noSubmissions>
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            <mat-icon>assignment</mat-icon>
+          </div>
+
+          <h3>No submissions yet</h3>
+
+          <p>
+            Solve a problem and submit your Python solution.
+            Your recent submissions will appear here.
+          </p>
+
+          <a
+            mat-flat-button
+            routerLink="/student/problems"
+          >
+            Browse Problems
+          </a>
+
+        </div>
+
+      </ng-template>
+
+    </section>
+
+  </ng-container>
 
 </div>

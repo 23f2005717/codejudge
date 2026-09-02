@@ -1,6 +1,7 @@
 <div class="app-shell">
 
   <header class="topbar">
+
     <div class="topbar-left">
 
       <button
@@ -29,11 +30,13 @@
     <div class="topbar-right">
 
       <div class="user-info">
+
         <div class="user-avatar">
           {{ userInitial }}
         </div>
 
         <div class="user-details">
+
           <span class="user-name">
             {{ user?.name }}
           </span>
@@ -41,7 +44,9 @@
           <span class="user-role">
             {{ roleLabel }}
           </span>
+
         </div>
+
       </div>
 
       <button
@@ -56,6 +61,7 @@
       </button>
 
     </div>
+
   </header>
 
 
@@ -67,6 +73,7 @@
     <nav class="navigation">
 
       <div class="navigation-section">
+
         <span class="navigation-title">
           Navigation
         </span>
@@ -82,6 +89,7 @@
           <mat-icon>{{ item.icon }}</mat-icon>
           <span>{{ item.label }}</span>
         </a>
+
       </div>
 
     </nav>
@@ -102,7 +110,9 @@
 
 
   <main class="content">
+
     <router-outlet></router-outlet>
+
   </main>
 
 </div>

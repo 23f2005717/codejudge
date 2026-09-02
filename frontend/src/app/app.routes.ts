@@ -9,6 +9,10 @@ import { roleGuard } from './core/guards/role.guard';
 import { AppShellComponent } from './shared/components/app-shell/app-shell.component';
 
 export const routes: Routes = [
+  // =====================================================
+  // PUBLIC
+  // =====================================================
+
   {
     path: '',
     pathMatch: 'full',
@@ -25,6 +29,10 @@ export const routes: Routes = [
     component: RegisterComponent
   },
 
+  // =====================================================
+  // AUTHENTICATED APPLICATION
+  // =====================================================
+
   {
     path: '',
     component: AppShellComponent,
@@ -32,15 +40,18 @@ export const routes: Routes = [
 
     children: [
 
-      // =====================================================
+      // =================================================
       // STUDENT
-      // =====================================================
+      // =================================================
 
       {
         path: 'student/dashboard',
         loadComponent: () =>
-          import('./features/student/dashboard/dashboard.component')
-            .then(m => m.DashboardComponent),
+          import(
+            './features/student/dashboard/dashboard.component'
+          ).then(
+            (m) => m.DashboardComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -52,8 +63,11 @@ export const routes: Routes = [
       {
         path: 'student/problems',
         loadComponent: () =>
-          import('./features/student/problems/problems.component')
-            .then(m => m.ProblemsComponent),
+          import(
+            './features/student/problems/problems.component'
+          ).then(
+            (m) => m.ProblemsComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -65,8 +79,11 @@ export const routes: Routes = [
       {
         path: 'student/problems/:id',
         loadComponent: () =>
-          import('./features/student/editor/editor.component')
-            .then(m => m.EditorComponent),
+          import(
+            './features/student/editor/editor.component'
+          ).then(
+            (m) => m.EditorComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -78,8 +95,11 @@ export const routes: Routes = [
       {
         path: 'student/submissions',
         loadComponent: () =>
-          import('./features/student/submissions/submissions.component')
-            .then(m => m.SubmissionsComponent),
+          import(
+            './features/student/submissions/submissions.component'
+          ).then(
+            (m) => m.SubmissionsComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -91,8 +111,11 @@ export const routes: Routes = [
       {
         path: 'student/leaderboard',
         loadComponent: () =>
-          import('./features/student/leaderboard/leaderboard.component')
-            .then(m => m.LeaderboardComponent),
+          import(
+            './features/student/leaderboard/leaderboard.component'
+          ).then(
+            (m) => m.LeaderboardComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -101,16 +124,18 @@ export const routes: Routes = [
         }
       },
 
-
-      // =====================================================
+      // =================================================
       // INSTRUCTOR
-      // =====================================================
+      // =================================================
 
       {
         path: 'instructor/dashboard',
         loadComponent: () =>
-          import('./features/instructor/dashboard/dashboard.component')
-            .then(m => m.DashboardComponent),
+          import(
+            './features/instructor/dashboard/dashboard.component'
+          ).then(
+            (m) => m.DashboardComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -118,12 +143,19 @@ export const routes: Routes = [
           roles: ['instructor']
         }
       },
+
+      // -------------------------------------------------
+      // PROBLEM MANAGEMENT
+      // -------------------------------------------------
 
       {
         path: 'instructor/problems',
         loadComponent: () =>
-          import('./features/instructor/problems/problems.component')
-            .then(m => m.ProblemsComponent),
+          import(
+            './features/instructor/problems/problems.component'
+          ).then(
+            (m) => m.ProblemsComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -132,16 +164,18 @@ export const routes: Routes = [
         }
       },
 
-      // -----------------------------------------------------
+      // -------------------------------------------------
       // CREATE PROBLEM
-      // -----------------------------------------------------
+      // -------------------------------------------------
 
       {
         path: 'instructor/problems/create',
         loadComponent: () =>
           import(
             './features/instructor/problems/create-edit-problem.component'
-          ).then(m => m.CreateEditProblemComponent),
+          ).then(
+            (m) => m.CreateEditProblemComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -150,16 +184,18 @@ export const routes: Routes = [
         }
       },
 
-      // -----------------------------------------------------
+      // -------------------------------------------------
       // EDIT PROBLEM
-      // -----------------------------------------------------
+      // -------------------------------------------------
 
       {
         path: 'instructor/problems/:id/edit',
         loadComponent: () =>
           import(
             './features/instructor/problems/create-edit-problem.component'
-          ).then(m => m.CreateEditProblemComponent),
+          ).then(
+            (m) => m.CreateEditProblemComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -168,15 +204,18 @@ export const routes: Routes = [
         }
       },
 
-      // -----------------------------------------------------
+      // -------------------------------------------------
       // TEST CASES
-      // -----------------------------------------------------
+      // -------------------------------------------------
 
       {
         path: 'instructor/testcases',
         loadComponent: () =>
-          import('./features/instructor/testcases/testcases.component')
-            .then(m => m.TestcasesComponent),
+          import(
+            './features/instructor/testcases/testcases.component'
+          ).then(
+            (m) => m.TestcasesComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -185,15 +224,18 @@ export const routes: Routes = [
         }
       },
 
-      // -----------------------------------------------------
+      // -------------------------------------------------
       // SUBMISSIONS
-      // -----------------------------------------------------
+      // -------------------------------------------------
 
       {
         path: 'instructor/submissions',
         loadComponent: () =>
-          import('./features/instructor/submissions/submissions.component')
-            .then(m => m.SubmissionsComponent),
+          import(
+            './features/instructor/submissions/submissions.component'
+          ).then(
+            (m) => m.SubmissionsComponent
+          ),
 
         canActivate: [roleGuard],
 
@@ -202,15 +244,18 @@ export const routes: Routes = [
         }
       },
 
-      // -----------------------------------------------------
+      // -------------------------------------------------
       // ANALYTICS
-      // -----------------------------------------------------
+      // -------------------------------------------------
 
       {
         path: 'instructor/analytics',
         loadComponent: () =>
-          import('./features/instructor/analytics/analytics.component')
-            .then(m => m.AnalyticsComponent),
+          import(
+            './features/instructor/analytics/analytics.component'
+          ).then(
+            (m) => m.AnalyticsComponent
+          ),
 
         canActivate: [roleGuard],
 

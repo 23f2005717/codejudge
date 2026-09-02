@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit
@@ -20,6 +21,7 @@ import {
 } from '../../../core/services/problem.service';
 
 import {
+  RunCodeResponse,
   SubmissionService
 } from '../../../core/services/submission.service';
 
@@ -72,7 +74,8 @@ export class EditorComponent
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly problemService: ProblemService,
-    private readonly submissionService: SubmissionService
+    private readonly submissionService: SubmissionService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -126,9 +129,16 @@ export class EditorComponent
           this.editor?.getValue() ?? '';
       });
 
-    } catch {
+    } catch (error) {
+      console.error(
+        'Monaco editor initialization error:',
+        error
+      );
+
       this.errorMessage =
         'Unable to load the code editor.';
+
+      this.cdr.detectChanges();
     }
   }
 
@@ -138,23 +148,87 @@ export class EditorComponent
   }
 
   runCode(): void {
-    /*
-     * The backend currently does not expose
-     * the documented /api/submissions/run endpoint.
-     *
-     * Run will be connected after that backend
-     * endpoint is implemented.
-     */
-    this.result = {
-      status: 'Run is not available yet',
-      score: null,
-      totalTests: null,
-      passedTests: null,
-      runtime: null,
-      memory: null,
-      errorMessage:
-        'The backend run endpoint has not been implemented yet.'
-    };
+    if (!this.code.trim()) {
+      this.result = {
+        status: 'Invalid',
+        score: null,
+        totalTests: null,
+        passedTests: null,
+        runtime: null,
+        memory: null,
+        errorMessage: 'Code is required.'
+      };
+
+      return;
+    }
+
+    if (this.problemId === null) {
+      return;
+    }
+
+    this.isRunning = true;
+    this.result = null;
+
+    const request =
+      this.submissionService.runCode(
+        this.problemId,
+        {
+          code: this.code,
+          language: 'python'
+        }
+      ).subscribe({
+
+        next: (response: RunCodeResponse) => {
+          const execution =
+            response.result;
+
+          this.result = {
+            status: execution.status,
+            score: null,
+            totalTests:
+              execution.total_tests,
+            passedTests:
+              execution.passed_tests,
+            runtime:
+              execution.execution_time !== null
+                ? execution.execution_time * 1000
+                : null,
+            memory: null,
+            errorMessage:
+              execution.error_message
+          };
+
+          this.isRunning = false;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (error) => {
+          console.error(
+            'Run code API error:',
+            error
+          );
+
+          this.isRunning = false;
+
+          this.result = {
+            status: 'Run Failed',
+            score: null,
+            totalTests: null,
+            passedTests: null,
+            runtime: null,
+            memory: null,
+            errorMessage:
+              error?.error?.message ??
+              'Unable to run the code.'
+          };
+
+          this.cdr.detectChanges();
+        }
+
+      });
+
+    this.subscriptions.add(request);
   }
 
   submitCode(): void {
@@ -207,9 +281,16 @@ export class EditorComponent
           };
 
           this.isSubmitting = false;
+
+          this.cdr.detectChanges();
         },
 
         error: (error) => {
+          console.error(
+            'Submit code API error:',
+            error
+          );
+
           this.isSubmitting = false;
 
           this.result = {
@@ -223,6 +304,8 @@ export class EditorComponent
               error?.error?.message ??
               'Unable to submit the code.'
           };
+
+          this.cdr.detectChanges();
         }
 
       });
@@ -246,9 +329,16 @@ export class EditorComponent
         next: (response) => {
           this.problem = response.problem;
           this.loading = false;
+
+          this.cdr.detectChanges();
         },
 
         error: (error) => {
+          console.error(
+            'Problem details API error:',
+            error
+          );
+
           this.loading = false;
 
           if (error.status === 404) {
@@ -256,8 +346,11 @@ export class EditorComponent
               'Problem not found.';
           } else {
             this.errorMessage =
+              error?.error?.message ??
               'Unable to load this problem.';
           }
+
+          this.cdr.detectChanges();
         }
 
       });

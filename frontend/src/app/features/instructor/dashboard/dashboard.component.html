@@ -1,305 +1,305 @@
-<div class="dashboard">
+<div class="dashboard-page">
 
-  <!-- Page header -->
-  <section class="page-header">
-
-    <div class="header-content">
-      <p class="eyebrow">Instructor</p>
-
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">INSTRUCTOR</div>
       <h1>Dashboard</h1>
-
-      <p class="subtitle">
-        Overview of your problems and student submissions.
-      </p>
+      <p>Overview of your problems and student submissions.</p>
     </div>
 
     <a
-      mat-flat-button
+      mat-button
       color="primary"
-      routerLink="/instructor/problems">
-
+      routerLink="/instructor/problems"
+      [queryParams]="{ action: 'create' }"
+      class="create-problem-button"
+    >
       <mat-icon>add</mat-icon>
       Create Problem
-
     </a>
+  </div>
 
-  </section>
+  <!-- Loading -->
+  <div
+    class="state-container"
+    *ngIf="isLoading"
+  >
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading dashboard...</p>
+  </div>
 
+  <!-- Error -->
+  <div
+    class="state-container error-state"
+    *ngIf="!isLoading && errorMessage"
+  >
+    <mat-icon>error_outline</mat-icon>
+    <h3>Unable to load dashboard</h3>
+    <p>{{ errorMessage }}</p>
 
-  <!-- Statistics cards -->
-  <section class="stats-grid">
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="loadDashboard()"
+    >
+      Try Again
+    </button>
+  </div>
 
-    @for (stat of stats; track stat.label) {
+  <ng-container *ngIf="!isLoading && !errorMessage">
 
-      <mat-card class="stat-card">
+    <!-- Statistics -->
+    <section class="stats-grid">
 
+      <mat-card
+        class="stat-card"
+        *ngFor="let stat of stats"
+      >
         <div class="stat-icon">
           <mat-icon>{{ stat.icon }}</mat-icon>
         </div>
 
         <div class="stat-content">
-
           <span class="stat-label">
             {{ stat.label }}
           </span>
 
-          <strong>
+          <strong class="stat-value">
             {{ stat.value }}
           </strong>
 
           <span class="stat-description">
             {{ stat.description }}
           </span>
-
         </div>
-
       </mat-card>
 
-    }
+    </section>
 
-  </section>
+    <!-- Main dashboard content -->
+    <section class="dashboard-grid">
 
+      <!-- Recent Problems -->
+      <mat-card class="dashboard-card recent-problems-card">
 
-  <!-- Dashboard panels -->
-  <section class="dashboard-grid">
+        <div class="card-header">
+          <div>
+            <h2>Recent Problems</h2>
+            <p>Recently created problems.</p>
+          </div>
 
-    <!-- Recent problems -->
-    <mat-card class="panel">
-
-      <div class="panel-header">
-
-        <div>
-          <h2>Recent Problems</h2>
-
-          <p>
-            Recently created problems.
-          </p>
+          <a
+            mat-button
+            color="primary"
+            routerLink="/instructor/problems"
+            class="view-all-link"
+          >
+            View All
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
         </div>
 
-        <a
-          mat-button
-          routerLink="/instructor/problems">
+        <div
+          class="problem-list"
+          *ngIf="recentProblems.length > 0"
+        >
 
-          View All
-          <mat-icon>arrow_forward</mat-icon>
+          <div
+            class="problem-row"
+            *ngFor="let problem of recentProblems"
+          >
 
-        </a>
+            <div class="problem-information">
 
-      </div>
-
-
-      <div class="problem-list">
-
-        @for (problem of recentProblems; track problem.id) {
-
-          <div class="problem-row">
-
-            <div class="problem-info">
-
-              <div class="problem-title">
+              <a
+                class="problem-title"
+                [routerLink]="[
+                  '/instructor/problems',
+                  problem.id
+                ]"
+              >
                 {{ problem.title }}
-              </div>
+              </a>
 
               <div class="problem-meta">
 
                 <span
                   class="difficulty"
-                  [class]="getDifficultyClass(problem.difficulty)">
-
+                  [ngClass]="getDifficultyClass(problem.difficulty)"
+                >
                   {{ problem.difficulty }}
-
                 </span>
 
                 <span class="submission-count">
-                  {{ problem.submissions }} submissions
+                  {{ problem.submissions }}
+                  {{ problem.submissions === 1 ? 'submission' : 'submissions' }}
                 </span>
 
               </div>
 
             </div>
 
-
-            @if (problem.published) {
-
-              <span class="status published">
-                Published
-              </span>
-
-            } @else {
-
-              <span class="status draft">
-                Draft
-              </span>
-
-            }
+            <span
+              class="publication-status"
+              [class.published]="problem.published"
+              [class.draft]="!problem.published"
+            >
+              {{ problem.published ? 'Published' : 'Draft' }}
+            </span>
 
           </div>
 
-        }
-
-      </div>
-
-    </mat-card>
-
-
-    <!-- Submission summary -->
-    <mat-card class="panel">
-
-      <div class="panel-header">
-
-        <div>
-          <h2>Submission Summary</h2>
-
-          <p>
-            Overall submission results.
-          </p>
         </div>
 
-      </div>
+        <!-- Empty -->
+        <div
+          class="empty-state"
+          *ngIf="recentProblems.length === 0"
+        >
+          <mat-icon>code</mat-icon>
+          <h3>No problems yet</h3>
+          <p>Create your first coding problem to get started.</p>
 
+          <a
+            mat-stroked-button
+            color="primary"
+            routerLink="/instructor/problems"
+            [queryParams]="{ action: 'create' }"
+          >
+            Create Problem
+          </a>
+        </div>
 
-      <div class="submission-list">
+      </mat-card>
 
-        @for (item of submissionSummary; track item.label) {
+      <!-- Submission Summary -->
+      <mat-card class="dashboard-card submission-summary-card">
 
-          <div class="submission-item">
+        <div class="card-header">
+          <div>
+            <h2>Submission Summary</h2>
+            <p>Overall submission results.</p>
+          </div>
+        </div>
 
-            <div class="submission-header">
+        <div
+          class="submission-summary"
+          *ngIf="submissionSummary.length > 0"
+        >
 
-              <span>
+          <div
+            class="summary-item"
+            *ngFor="let item of submissionSummary"
+          >
+
+            <div class="summary-header">
+
+              <span class="summary-label">
                 {{ item.label }}
               </span>
 
-              <strong>
+              <strong class="summary-value">
                 {{ item.value }}
               </strong>
 
             </div>
 
             <div class="progress-track">
-
               <div
                 class="progress-bar"
-                [style.width.%]="item.percentage">
-              </div>
-
+                [ngClass]="getDifficultyClass('Easy')"
+                [style.width.%]="item.percentage"
+                [class.accepted-progress]="item.label === 'Accepted'"
+                [class.wrong-progress]="item.label === 'Wrong Answer'"
+                [class.runtime-progress]="item.label === 'Runtime Error'"
+                [class.time-limit-progress]="item.label === 'Time Limit'"
+              ></div>
             </div>
 
-            <span class="percentage">
+            <div class="summary-percentage">
               {{ item.percentage }}%
-            </span>
+            </div>
 
           </div>
 
-        }
+        </div>
 
-      </div>
-
-    </mat-card>
-
-  </section>
-
-
-  <!-- Quick actions -->
-  <section class="quick-actions">
-
-    <div class="section-header">
-
-      <div>
-        <h2>Quick Actions</h2>
-
-        <p>
-          Common instructor tasks.
-        </p>
-      </div>
-
-    </div>
-
-
-    <div class="action-grid">
-
-      <a
-        class="action-card"
-        routerLink="/instructor/problems">
-
-        <span class="action-icon">
-          <mat-icon>library_books</mat-icon>
-        </span>
-
-        <span class="action-content">
-
-          <strong>
-            Manage Problems
-          </strong>
-
-          <small>
-            Create, edit and publish problems.
-          </small>
-
-        </span>
-
-        <mat-icon class="action-arrow">
-          arrow_forward
-        </mat-icon>
-
-      </a>
-
-
-      <a
-        class="action-card"
-        routerLink="/instructor/submissions">
-
-        <span class="action-icon">
+        <!-- Empty -->
+        <div
+          class="empty-state compact"
+          *ngIf="submissionSummary.length === 0"
+        >
           <mat-icon>assignment</mat-icon>
-        </span>
+          <p>No submissions yet.</p>
+        </div>
 
-        <span class="action-content">
+      </mat-card>
 
-          <strong>
-            View Submissions
-          </strong>
+    </section>
 
-          <small>
-            Review student submissions and results.
-          </small>
+    <!-- Quick Actions -->
+    <section class="quick-actions-section">
 
-        </span>
+      <h2>Quick Actions</h2>
 
-        <mat-icon class="action-arrow">
-          arrow_forward
-        </mat-icon>
+      <div class="quick-actions-grid">
 
-      </a>
+        <a
+          mat-stroked-button
+          routerLink="/instructor/problems"
+          class="quick-action"
+        >
+          <mat-icon>code</mat-icon>
 
+          <span>
+            <strong>Manage Problems</strong>
+            <small>Create, edit and publish problems</small>
+          </span>
 
-      <a
-        class="action-card"
-        routerLink="/instructor/statistics">
+          <mat-icon class="action-arrow">
+            arrow_forward
+          </mat-icon>
+        </a>
 
-        <span class="action-icon">
+        <a
+          mat-stroked-button
+          routerLink="/instructor/submissions"
+          class="quick-action"
+        >
+          <mat-icon>assignment</mat-icon>
+
+          <span>
+            <strong>View Submissions</strong>
+            <small>Review student submissions</small>
+          </span>
+
+          <mat-icon class="action-arrow">
+            arrow_forward
+          </mat-icon>
+        </a>
+
+        <a
+          mat-stroked-button
+          routerLink="/instructor/analytics"
+          class="quick-action"
+        >
           <mat-icon>bar_chart</mat-icon>
-        </span>
 
-        <span class="action-content">
+          <span>
+            <strong>View Analytics</strong>
+            <small>View performance statistics</small>
+          </span>
 
-          <strong>
-            View Statistics
-          </strong>
+          <mat-icon class="action-arrow">
+            arrow_forward
+          </mat-icon>
+        </a>
 
-          <small>
-            See problem and submission statistics.
-          </small>
+      </div>
 
-        </span>
+    </section>
 
-        <mat-icon class="action-arrow">
-          arrow_forward
-        </mat-icon>
-
-      </a>
-
-    </div>
-
-  </section>
+  </ng-container>
 
 </div>

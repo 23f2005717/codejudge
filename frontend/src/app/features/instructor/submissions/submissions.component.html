@@ -1,25 +1,24 @@
-<div class="submissions-page">
+<div class="page-container">
 
-  <header class="page-header">
+  <div class="page-header">
     <div>
-      <p class="eyebrow">Instructor</p>
+      <span class="eyebrow">Instructor</span>
       <h1>Submissions</h1>
-      <p class="subtitle">
-        Review student submissions and their evaluation results.
-      </p>
+      <p>Review student submissions across your problems.</p>
     </div>
-  </header>
+  </div>
 
-  <section class="summary-grid">
+  <!-- Summary -->
+  <div class="summary-grid">
 
     <mat-card class="summary-card">
       <div class="summary-icon">
-        <mat-icon>code</mat-icon>
+        <mat-icon>assignment</mat-icon>
       </div>
 
-      <div>
+      <div class="summary-content">
         <span>Total Submissions</span>
-        <strong>{{ submissions.length }}</strong>
+        <strong>{{ totalCount }}</strong>
       </div>
     </mat-card>
 
@@ -28,7 +27,7 @@
         <mat-icon>check_circle</mat-icon>
       </div>
 
-      <div>
+      <div class="summary-content">
         <span>Accepted</span>
         <strong>{{ acceptedCount }}</strong>
       </div>
@@ -39,7 +38,7 @@
         <mat-icon>cancel</mat-icon>
       </div>
 
-      <div>
+      <div class="summary-content">
         <span>Failed</span>
         <strong>{{ failedCount }}</strong>
       </div>
@@ -50,49 +49,32 @@
         <mat-icon>percent</mat-icon>
       </div>
 
-      <div>
+      <div class="summary-content">
         <span>Acceptance Rate</span>
         <strong>{{ acceptanceRate }}%</strong>
       </div>
     </mat-card>
 
-  </section>
+  </div>
 
   <mat-card class="content-card">
 
+    <!-- Filters -->
     <div class="filters">
 
-      <mat-form-field
-        appearance="outline"
-        class="search-field"
-      >
+      <mat-form-field appearance="outline">
         <mat-label>Search submissions</mat-label>
-
-        <mat-icon matPrefix>search</mat-icon>
 
         <input
           matInput
           [(ngModel)]="searchTerm"
-          placeholder="Student or problem"
+          placeholder="Student, email, or problem"
         />
 
-        @if (searchTerm) {
-          <button
-            mat-icon-button
-            matSuffix
-            type="button"
-            aria-label="Clear search"
-            (click)="searchTerm = ''"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-        }
+        <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 
-      <mat-form-field
-        appearance="outline"
-        class="filter-field"
-      >
+      <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
 
         <mat-select [(ngModel)]="selectedStatus">
@@ -104,10 +86,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field
-        appearance="outline"
-        class="filter-field"
-      >
+      <mat-form-field appearance="outline">
         <mat-label>Language</mat-label>
 
         <mat-select [(ngModel)]="selectedLanguage">
@@ -119,229 +98,286 @@
         </mat-select>
       </mat-form-field>
 
-      @if (
-        searchTerm ||
-        selectedStatus !== 'All' ||
-        selectedLanguage !== 'All'
-      ) {
+      <button
+        mat-stroked-button
+        type="button"
+        class="clear-button"
+        (click)="clearFilters()"
+      >
+        <mat-icon>filter_alt_off</mat-icon>
+        Clear
+      </button>
+
+    </div>
+
+    <!-- Result count -->
+    @if (!isLoading && !errorMessage) {
+      <div class="result-bar">
+        <span>
+          Showing
+          <strong>{{ filteredSubmissions.length }}</strong>
+          of
+          <strong>{{ totalCount }}</strong>
+          submissions
+        </span>
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="state-container">
+        <mat-spinner diameter="42"></mat-spinner>
+
+        <p>Loading submissions...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (!isLoading && errorMessage) {
+      <div class="state-container error-state">
+
+        <mat-icon>error_outline</mat-icon>
+
+        <h3>Unable to load submissions</h3>
+
+        <p>{{ errorMessage }}</p>
+
         <button
-          mat-button
+          mat-flat-button
           type="button"
-          class="clear-button"
-          (click)="clearFilters()"
+          (click)="loadSubmissions()"
         >
-          Clear
+          <mat-icon>refresh</mat-icon>
+          Retry
         </button>
-      }
 
-    </div>
-
-    <div class="result-bar">
-      Showing {{ filteredSubmissions.length }}
-      {{ filteredSubmissions.length === 1 ? 'submission' : 'submissions' }}
-    </div>
+      </div>
+    }
 
     <!-- Desktop table -->
+    @if (
+      !isLoading &&
+      !errorMessage &&
+      filteredSubmissions.length > 0
+    ) {
 
-    <div class="table-wrapper">
+      <div class="table-wrapper">
 
-      <table>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Problem</th>
-            <th>Language</th>
-            <th>Status</th>
-            <th>Execution</th>
-            <th>Submitted</th>
-            <th></th>
-          </tr>
-        </thead>
+        <table class="submissions-table">
 
-        <tbody>
-
-          @for (
-            submission of filteredSubmissions;
-            track submission.id
-          ) {
-
+          <thead>
             <tr>
+              <th>Student</th>
+              <th>Problem</th>
+              <th>Language</th>
+              <th>Status</th>
+              <th>Execution</th>
+              <th>Submitted</th>
+              <th class="action-column"></th>
+            </tr>
+          </thead>
 
-              <td>
-                <div class="student-name">
-                  {{ submission.student }}
+          <tbody>
+
+            @for (
+              submission of filteredSubmissions;
+              track submission.id
+            ) {
+
+              <tr>
+
+                <td>
+                  <div class="student-cell">
+                    <div class="student-avatar">
+                      {{ submission.student.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div>
+                      <strong>{{ submission.student }}</strong>
+                      <span>{{ submission.email }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="problem-name">
+                    {{ submission.problem }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="language-badge">
+                    {{ submission.language }}
+                  </span>
+                </td>
+
+                <td>
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(submission.status)"
+                  >
+                    <span class="status-dot"></span>
+                    {{ submission.status }}
+                  </span>
+                </td>
+
+                <td>
+                  {{ submission.executionTime }}
+                </td>
+
+                <td>
+                  {{ submission.submittedAt }}
+                </td>
+
+                <td class="action-column">
+
+                  <button
+                    mat-icon-button
+                    type="button"
+                    aria-label="View submission"
+                    [routerLink]="[
+                      '/instructor/submissions',
+                      submission.id
+                    ]"
+                  >
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- Mobile cards -->
+      <div class="mobile-submissions">
+
+        @for (
+          submission of filteredSubmissions;
+          track submission.id
+        ) {
+
+          <mat-card class="submission-card">
+
+            <div class="submission-card-header">
+
+              <div class="student-cell">
+
+                <div class="student-avatar">
+                  {{ submission.student.charAt(0).toUpperCase() }}
                 </div>
 
-                <span class="student-email">
-                  {{ submission.email }}
-                </span>
-              </td>
+                <div>
+                  <strong>{{ submission.student }}</strong>
+                  <span>{{ submission.email }}</span>
+                </div>
 
-              <td>
-                <span class="problem-name">
-                  {{ submission.problem }}
-                </span>
-              </td>
+              </div>
 
-              <td>
-                <span class="language-badge">
-                  {{ submission.language }}
-                </span>
-              </td>
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(submission.status)"
+              >
+                <span class="status-dot"></span>
+                {{ submission.status }}
+              </span>
 
-              <td>
-                <span
-                  class="status-badge"
-                  [class]="getStatusClass(submission.status)"
-                >
-                  <mat-icon>
-                    {{
-                      submission.status === 'Accepted'
-                        ? 'check_circle'
-                        : 'error'
-                    }}
-                  </mat-icon>
+            </div>
 
-                  {{ submission.status }}
-                </span>
-              </td>
+            <div class="submission-card-body">
 
-              <td class="execution-time">
-                {{ submission.executionTime }}
-              </td>
+              <div class="detail-item">
+                <span>Problem</span>
+                <strong>{{ submission.problem }}</strong>
+              </div>
 
-              <td class="submitted-date">
-                {{ submission.submittedAt }}
-              </td>
+              <div class="detail-item">
+                <span>Language</span>
+                <strong>{{ submission.language }}</strong>
+              </div>
 
-              <td class="action-cell">
-                <button
-                  mat-icon-button
-                  aria-label="View submission"
-                >
-                  <mat-icon>chevron_right</mat-icon>
-                </button>
-              </td>
+              <div class="detail-item">
+                <span>Execution</span>
+                <strong>{{ submission.executionTime }}</strong>
+              </div>
 
-            </tr>
+              <div class="detail-item">
+                <span>Submitted</span>
+                <strong>{{ submission.submittedAt }}</strong>
+              </div>
 
-          }
+            </div>
 
-        </tbody>
-      </table>
+            <div class="submission-card-footer">
 
-      @if (filteredSubmissions.length === 0) {
-        <div class="empty-state">
-          <mat-icon>search_off</mat-icon>
+              <button
+                mat-stroked-button
+                type="button"
+                [routerLink]="[
+                  '/instructor/submissions',
+                  submission.id
+                ]"
+              >
+                View Submission
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
 
-          <h3>No submissions found</h3>
+            </div>
+
+          </mat-card>
+
+        }
+
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (
+      !isLoading &&
+      !errorMessage &&
+      filteredSubmissions.length === 0
+    ) {
+
+      <div class="state-container empty-state">
+
+        <mat-icon>inbox</mat-icon>
+
+        @if (totalCount === 0) {
+
+          <h3>No submissions yet</h3>
 
           <p>
-            Try changing your search or filters.
+            Student submissions will appear here once
+            they submit solutions to your problems.
+          </p>
+
+        } @else {
+
+          <h3>No matching submissions</h3>
+
+          <p>
+            Try changing your search or filter criteria.
           </p>
 
           <button
             mat-stroked-button
+            type="button"
             (click)="clearFilters()"
           >
             Clear Filters
           </button>
-        </div>
-      }
 
-    </div>
+        }
 
-    <!-- Mobile cards -->
+      </div>
 
-    <div class="mobile-list">
-
-      @for (
-        submission of filteredSubmissions;
-        track submission.id
-      ) {
-
-        <mat-card class="submission-card">
-
-          <div class="mobile-header">
-
-            <div>
-              <h3>{{ submission.student }}</h3>
-              <span>{{ submission.email }}</span>
-            </div>
-
-            <button
-              mat-icon-button
-              aria-label="View submission"
-            >
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-
-          </div>
-
-          <div class="problem-row">
-            <span class="label">Problem</span>
-            <strong>{{ submission.problem }}</strong>
-          </div>
-
-          <div class="details-grid">
-
-            <div>
-              <span class="label">Language</span>
-              <strong>{{ submission.language }}</strong>
-            </div>
-
-            <div>
-              <span class="label">Execution</span>
-              <strong>{{ submission.executionTime }}</strong>
-            </div>
-
-          </div>
-
-          <div class="mobile-footer">
-
-            <span
-              class="status-badge"
-              [class]="getStatusClass(submission.status)"
-            >
-              <mat-icon>
-                {{
-                  submission.status === 'Accepted'
-                    ? 'check_circle'
-                    : 'error'
-                }}
-              </mat-icon>
-
-              {{ submission.status }}
-            </span>
-
-            <span class="submitted-date">
-              {{ submission.submittedAt }}
-            </span>
-
-          </div>
-
-        </mat-card>
-
-      }
-
-      @if (filteredSubmissions.length === 0) {
-        <div class="empty-state">
-          <mat-icon>search_off</mat-icon>
-
-          <h3>No submissions found</h3>
-
-          <p>Try changing your search or filters.</p>
-
-          <button
-            mat-stroked-button
-            (click)="clearFilters()"
-          >
-            Clear Filters
-          </button>
-        </div>
-      }
-
-    </div>
+    }
 
   </mat-card>
 

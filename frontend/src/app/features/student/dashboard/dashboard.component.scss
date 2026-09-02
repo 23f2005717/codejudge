@@ -1,11 +1,7 @@
-:host {
-  display: block;
-}
-
 .dashboard-page {
-  width: 100%;
-  max-width: 1200px;
+  max-width: 1540px;
   margin: 0 auto;
+  padding: 46px 36px 60px;
 }
 
 .page-header {
@@ -13,184 +9,165 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .eyebrow {
   display: block;
   margin-bottom: 8px;
-
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 600;
+  color: #3367d6;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.7px;
 }
 
 .page-header h1 {
   margin: 0;
-
-  color: #111827;
-  font-size: 30px;
+  color: #101828;
+  font-size: 36px;
   line-height: 1.2;
   font-weight: 700;
 }
 
 .page-header p {
   margin: 8px 0 0;
-
-  color: #6b7280;
-  font-size: 14px;
+  color: #667085;
+  font-size: 16px;
 }
 
-.problems-button,
-.practice-button {
-  min-height: 42px;
-
-  background: #2563eb;
-  color: #ffffff;
-
+.problems-button {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
   font-weight: 600;
 }
 
-.problems-button mat-icon,
-.practice-button mat-icon {
-  margin-right: 6px;
+.problems-button mat-icon {
+  margin-right: 8px;
 }
-
-
-/* Statistics */
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
   margin-bottom: 32px;
 }
 
 .stat-card {
-  min-height: 118px;
-  padding: 22px;
-
   display: flex;
   align-items: center;
-  gap: 16px;
-
+  gap: 18px;
+  min-height: 128px;
+  padding: 24px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
 .stat-icon {
-  width: 46px;
-  height: 46px;
-
-  flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 9px;
-  background: #eaf1ff;
-  color: #2563eb;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: #3367d6;
 }
 
 .stat-icon mat-icon {
-  font-size: 23px;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
 }
 
 .stat-content {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  min-width: 0;
 }
 
 .stat-label {
-  color: #6b7280;
-  font-size: 13px;
+  display: block;
+  margin-bottom: 6px;
+  color: #667085;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .stat-value {
-  color: #111827;
-  font-size: 25px;
+  display: block;
+  color: #101828;
+  font-size: 30px;
   line-height: 1;
+  font-weight: 700;
 }
 
-
-/* Recent submissions */
-
 .dashboard-section {
-  margin-bottom: 28px;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .section-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
-
-  margin-bottom: 14px;
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid #eaecf0;
 }
 
 .section-header h2 {
   margin: 0;
-
-  color: #111827;
-  font-size: 18px;
-  font-weight: 650;
+  color: #101828;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .section-header p {
-  margin: 5px 0 0;
-
-  color: #6b7280;
-  font-size: 13px;
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 14px;
 }
 
 .view-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-
-  color: #2563eb;
-  font-size: 13px;
+  gap: 6px;
+  color: #3367d6;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-}
-
-.view-link mat-icon {
-  width: 17px;
-  height: 17px;
-  font-size: 17px;
+  white-space: nowrap;
 }
 
 .view-link:hover {
   text-decoration: underline;
 }
 
-.submissions-card {
-  overflow: hidden;
+.view-link mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
 
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+.submissions-card {
+  width: 100%;
 }
 
 .submission-row {
-  min-height: 58px;
-  padding: 0 20px;
-
   display: grid;
-  grid-template-columns: 2fr 1fr 0.7fr 1fr;
+  grid-template-columns: minmax(240px, 1.5fr) minmax(150px, 0.8fr) minmax(100px, 0.5fr) minmax(190px, 1fr);
   align-items: center;
-
-  border-bottom: 1px solid #eef0f3;
-
-  color: #4b5563;
-  font-size: 13px;
+  min-height: 72px;
+  padding: 0 24px;
+  column-gap: 20px;
+  border-bottom: 1px solid #eaecf0;
+  color: #344054;
+  font-size: 14px;
 }
 
 .submission-row:last-child {
@@ -198,168 +175,213 @@
 }
 
 .submission-header {
-  min-height: 44px;
-
-  background: #f9fafb;
-
-  color: #6b7280;
-  font-size: 11px;
+  min-height: 48px;
+  background: #f8fafc;
+  color: #667085;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
 }
 
 .problem-name {
-  color: #111827;
+  overflow: hidden;
+  color: #101828;
   font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.problem-name:hover {
+  color: #3367d6;
+  text-decoration: underline;
 }
 
 .submission-status {
-  color: #dc2626;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #475467;
   font-size: 12px;
   font-weight: 600;
 }
 
 .submission-status.accepted {
-  color: #15803d;
+  background: #ecfdf3;
+  color: #027a48;
 }
 
+.submission-status.wrong-answer {
+  background: #fef3f2;
+  color: #b42318;
+}
 
-/* Empty state */
+.submission-status.runtime-error,
+.submission-status.execution-error {
+  background: #fff4ed;
+  color: #c4320a;
+}
+
+.submission-status.time-limit {
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.submission-status.no-test-cases,
+.submission-status.pending {
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.score {
+  color: #344054;
+  font-weight: 600;
+}
+
+.submitted-date {
+  color: #667085;
+  white-space: nowrap;
+}
+
+.loading-state {
+  display: flex;
+  min-height: 260px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+}
+
+.loading-state p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.error-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  background: #fff8f7;
+  border: 1px solid #fecdca;
+  border-radius: 12px;
+}
+
+.error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.error-state h3 {
+  margin: 0 0 6px;
+  color: #912018;
+  font-size: 16px;
+}
+
+.error-state p {
+  margin: 0 0 16px;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.error-state button mat-icon {
+  margin-right: 6px;
+}
 
 .empty-state {
-  padding: 50px 24px;
-
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 300px;
+  padding: 40px 24px;
   text-align: center;
-
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
 }
 
 .empty-icon {
-  width: 52px;
-  height: 52px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  margin-bottom: 15px;
-
+  width: 58px;
+  height: 58px;
+  margin-bottom: 16px;
   border-radius: 50%;
-  background: #f3f6fb;
-  color: #6b7280;
+  background: #f2f4f7;
+  color: #667085;
 }
 
 .empty-icon mat-icon {
-  font-size: 25px;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
 }
 
 .empty-state h3 {
-  margin: 0;
-
-  color: #111827;
-  font-size: 16px;
+  margin: 0 0 8px;
+  color: #101828;
+  font-size: 18px;
 }
 
 .empty-state p {
-  max-width: 430px;
-  margin: 7px 0 18px;
-
-  color: #6b7280;
-  font-size: 13px;
+  max-width: 440px;
+  margin: 0 0 20px;
+  color: #667085;
+  font-size: 14px;
   line-height: 1.6;
 }
 
-
-/* Practice card */
-
-.practice-card {
-  padding: 22px 24px;
-
-  display: flex;
-  align-items: center;
-  gap: 18px;
-
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-}
-
-.practice-icon {
-  width: 44px;
-  height: 44px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+.empty-state a {
+  min-height: 42px;
   border-radius: 8px;
-  background: #eef2ff;
-  color: #4f46e5;
+  padding: 0 18px;
 }
 
-.practice-content {
-  flex: 1;
-}
-
-.practice-content h2 {
-  margin: 0;
-
-  color: #111827;
-  font-size: 16px;
-}
-
-.practice-content p {
-  margin: 5px 0 0;
-
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-
-/* Responsive */
-
-@media (max-width: 800px) {
-
-  .page-header {
-    align-items: flex-start;
-    flex-direction: column;
+@media (max-width: 1000px) {
+  .dashboard-page {
+    padding: 36px 24px 48px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
   }
 
-  .stat-card {
-    min-height: 100px;
-  }
-
-  .practice-card {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .practice-content {
-    min-width: calc(100% - 62px);
-  }
-
-  .practice-button {
-    margin-left: 62px;
+  .submission-row {
+    grid-template-columns:
+      minmax(190px, 1.4fr)
+      minmax(130px, 0.8fr)
+      minmax(90px, 0.5fr)
+      minmax(160px, 1fr);
+    padding: 0 18px;
+    column-gap: 12px;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 760px) {
+  .dashboard-page {
+    padding: 28px 16px 40px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
   .page-header h1 {
-    font-size: 26px;
+    font-size: 30px;
   }
 
   .problems-button {
@@ -369,26 +391,53 @@
   .section-header {
     align-items: flex-start;
     flex-direction: column;
+    padding: 20px;
   }
 
   .submission-row {
-    grid-template-columns: 1.7fr 1fr 0.7fr;
-    padding: 0 14px;
+    display: block;
+    min-height: auto;
+    padding: 16px 20px;
   }
 
-  .submission-row span:last-child {
+  .submission-header {
     display: none;
   }
 
-  .submission-header span:last-child {
-    display: none;
+  .submission-row > span,
+  .submission-row > a {
+    display: block;
+    margin-bottom: 9px;
   }
 
-  .practice-card {
-    padding: 18px;
+  .submission-row > :last-child {
+    margin-bottom: 0;
   }
 
-  .practice-button {
-    margin-left: 0;
+  .submitted-date {
+    white-space: normal;
+  }
+
+  .error-state {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: 22px 12px 32px;
+  }
+
+  .page-header h1 {
+    font-size: 26px;
+  }
+
+  .stat-card {
+    min-height: 108px;
+    padding: 20px;
+  }
+
+  .stat-value {
+    font-size: 26px;
   }
 }

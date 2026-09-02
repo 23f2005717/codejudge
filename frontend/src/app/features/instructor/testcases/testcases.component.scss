@@ -38,6 +38,39 @@ h1 {
   min-width: 145px;
 }
 
+/* Messages */
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 13px;
+
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}
+
+.error-message {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.success-message {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+/* Summary */
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -82,6 +115,8 @@ h1 {
   }
 }
 
+/* Main content */
+
 .content-card {
   padding: 0;
   border: 1px solid #e5e7eb;
@@ -89,6 +124,69 @@ h1 {
   box-shadow: none;
   overflow: hidden;
 }
+
+/* Problem selector */
+
+.problem-selector {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.problem-field {
+  width: min(520px, 100%);
+  margin-bottom: -1.25em;
+}
+
+/* Add test case */
+
+.add-testcase-form {
+  padding: 24px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.form-header {
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.visibility-field {
+  width: min(260px, 100%);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Toolbar */
 
 .toolbar {
   display: flex;
@@ -107,6 +205,38 @@ h1 {
   color: #6b7280;
   font-size: 13px;
 }
+
+/* Loading */
+
+.loading-state {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+
+  mat-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 42px;
+    color: #9ca3af;
+  }
+
+  h3 {
+    margin: 14px 0 5px;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+/* Desktop table */
 
 .table-wrapper {
   width: 100%;
@@ -204,6 +334,8 @@ pre {
   text-align: right;
 }
 
+/* Empty state */
+
 .empty-state {
   min-height: 280px;
   display: flex;
@@ -232,9 +364,13 @@ pre {
   }
 }
 
+/* Mobile */
+
 .mobile-list {
   display: none;
 }
+
+/* Tablet */
 
 @media (max-width: 800px) {
   .summary-grid {
@@ -248,7 +384,17 @@ pre {
   .create-button {
     flex-shrink: 0;
   }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visibility-field {
+    width: 100%;
+  }
 }
+
+/* Phone */
 
 @media (max-width: 650px) {
   .testcases-page {
@@ -266,6 +412,27 @@ pre {
 
   .create-button {
     width: 100%;
+  }
+
+  .problem-selector {
+    padding: 16px;
+  }
+
+  .problem-field {
+    width: 100%;
+  }
+
+  .add-testcase-form {
+    padding: 20px 16px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
   }
 
   .toolbar {

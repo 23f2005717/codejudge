@@ -1,20 +1,64 @@
 <div class="leaderboard-page">
 
-  <div class="page-header">
+  <section class="page-header">
+
     <div>
+      <span class="eyebrow">Student Rankings</span>
+
       <h1>Leaderboard</h1>
+
       <p>
         See how you rank against other students.
       </p>
     </div>
+
+  </section>
+
+  <div
+    class="loading-state"
+    *ngIf="isLoading"
+  >
+    <mat-spinner diameter="36"></mat-spinner>
+
+    <p>Loading leaderboard...</p>
   </div>
 
-  <section class="leaderboard-card">
+  <div
+    class="error-state"
+    *ngIf="!isLoading && errorMessage"
+  >
+
+    <div class="error-icon">
+      <mat-icon>error_outline</mat-icon>
+    </div>
+
+    <div>
+      <h3>Unable to load leaderboard</h3>
+
+      <p>{{ errorMessage }}</p>
+
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="loadLeaderboard()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Try Again
+      </button>
+    </div>
+
+  </div>
+
+  <section
+    class="leaderboard-card"
+    *ngIf="!isLoading && !errorMessage"
+  >
 
     <div
       class="table-container"
       *ngIf="leaderboard.length > 0; else emptyState"
     >
+
       <table>
 
         <thead>
@@ -23,26 +67,36 @@
             <th>Student</th>
             <th>Problems Solved</th>
             <th>Submissions</th>
-            <th>Score</th>
+            <th>Total Score</th>
           </tr>
         </thead>
 
         <tbody>
+
           <tr
-            *ngFor="let entry of leaderboard"
+            *ngFor="
+              let entry of leaderboard;
+              trackBy: trackByRank
+            "
             [class.top-rank]="entry.rank <= 3"
           >
 
             <td>
+
               <div class="rank">
-                <mat-icon *ngIf="entry.rank <= 3">
-                  emoji_events
+
+                <mat-icon
+                  *ngIf="entry.rank <= 3"
+                >
+                  {{ getRankIcon(entry.rank) }}
                 </mat-icon>
 
                 <span>
                   #{{ entry.rank }}
                 </span>
+
               </div>
+
             </td>
 
             <td>
@@ -60,15 +114,17 @@
             </td>
 
             <td>
-              <strong>
+              <strong class="score">
                 {{ entry.score }}
               </strong>
             </td>
 
           </tr>
+
         </tbody>
 
       </table>
+
     </div>
 
     <ng-template #emptyState>
@@ -79,11 +135,11 @@
           <mat-icon>leaderboard</mat-icon>
         </div>
 
-        <h2>Leaderboard is not available yet</h2>
+        <h2>No leaderboard data yet</h2>
 
         <p>
-          Leaderboard rankings will appear here once
-          the leaderboard data is connected to the backend.
+          Rankings will appear here once students
+          start submitting solutions.
         </p>
 
       </div>

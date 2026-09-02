@@ -1,384 +1,348 @@
 <div class="analytics-page">
 
   <header class="page-header">
-    <div>
-      <p class="eyebrow">Instructor</p>
-
-      <h1>Analytics</h1>
-
-      <p class="subtitle">
-        Overview of problem performance and student submissions.
-      </p>
-    </div>
+    <p class="eyebrow">Instructor</p>
+    <h1>Analytics</h1>
+    <p class="subtitle">
+      Overview of problem performance and student submissions.
+    </p>
   </header>
 
+  @if (isLoading) {
+    <section class="state-card">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading analytics...</p>
+    </section>
+  }
 
-  <!-- Overview -->
+  @if (!isLoading && errorMessage) {
+    <section class="state-card error-state">
+      <mat-icon>error_outline</mat-icon>
+      <h2>Unable to load analytics</h2>
+      <p>{{ errorMessage }}</p>
 
-  <section class="overview-grid">
+      <button
+        mat-flat-button
+        type="button"
+        (click)="loadAnalytics()">
+        Try Again
+      </button>
+    </section>
+  }
 
-    <mat-card class="overview-card">
+  @if (!isLoading && !errorMessage) {
 
-      <div class="overview-icon">
-        <mat-icon>code</mat-icon>
-      </div>
+    <!-- Overview -->
+    <section class="overview-grid">
 
-      <div class="overview-content">
-        <span>Total Submissions</span>
+      <mat-card class="overview-card">
+        <div class="card-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
 
-        <strong>{{ totalSubmissions }}</strong>
+        <div class="card-content">
+          <span class="card-label">Total Submissions</span>
+          <strong>{{ totalSubmissions }}</strong>
+          <span class="card-helper">
+            All submissions received
+          </span>
+        </div>
+      </mat-card>
 
-        <small>Across all problems</small>
-      </div>
+      <mat-card class="overview-card">
+        <div class="card-icon">
+          <mat-icon>code</mat-icon>
+        </div>
 
-    </mat-card>
+        <div class="card-content">
+          <span class="card-label">Total Problems</span>
+          <strong>{{ totalProblems }}</strong>
+          <span class="card-helper">
+            {{ publishedProblems }} currently published
+          </span>
+        </div>
+      </mat-card>
 
+      <mat-card class="overview-card">
+        <div class="card-icon">
+          <mat-icon>groups</mat-icon>
+        </div>
 
-    <mat-card class="overview-card">
+        <div class="card-content">
+          <span class="card-label">Active Students</span>
+          <strong>{{ activeStudents }}</strong>
+          <span class="card-helper">
+            Students with submissions
+          </span>
+        </div>
+      </mat-card>
 
-      <div class="overview-icon">
-        <mat-icon>assignment</mat-icon>
-      </div>
-
-      <div class="overview-content">
-        <span>Total Problems</span>
-
-        <strong>{{ totalProblems }}</strong>
-
-        <small>
-          {{ publishedProblems }} currently published
-        </small>
-      </div>
-
-    </mat-card>
-
-
-    <mat-card class="overview-card">
-
-      <div class="overview-icon">
-        <mat-icon>groups</mat-icon>
-      </div>
-
-      <div class="overview-content">
-        <span>Active Students</span>
-
-        <strong>{{ activeStudents }}</strong>
-
-        <small>
-          Students with submissions
-        </small>
-      </div>
-
-    </mat-card>
-
-  </section>
-
-
-  <!-- Analytics summary -->
-
-  <section class="analytics-grid">
+    </section>
 
     <!-- Submission Results -->
-
-    <mat-card class="panel-card">
-
-      <div class="panel-header">
+    <section class="analytics-section">
+      <div class="section-header">
         <div>
+          <p class="eyebrow">Submissions</p>
           <h2>Submission Results</h2>
-
-          <p>
-            Breakdown of submission outcomes.
-          </p>
         </div>
       </div>
 
-
-      <div class="status-list">
-
-        @for (
-          status of submissionStatuses;
-          track status.label
-        ) {
-
-          <div class="status-item">
-
-            <div class="status-header">
-
-              <div class="status-label">
-
-                <span
-                  class="status-dot"
-                  [class]="getStatusClass(status.label)"
-                ></span>
-
-                <strong>
-                  {{ status.label }}
-                </strong>
-
-              </div>
-
-
-              <div class="status-value">
-
-                <strong>
-                  {{ status.count }}
-                </strong>
-
-                <span>
-                  {{ status.percentage }}%
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <mat-progress-bar
-              mode="determinate"
-              [value]="status.percentage"
-            ></mat-progress-bar>
-
-          </div>
-
-        }
-
-      </div>
-
-    </mat-card>
-
-
-    <!-- Difficulty -->
-
-    <mat-card class="panel-card">
-
-      <div class="panel-header">
-        <div>
-          <h2>Problem Difficulty</h2>
-
-          <p>
-            Published problem distribution.
-          </p>
-        </div>
-      </div>
-
-
-      <div class="difficulty-list">
-
-        <div class="difficulty-row">
-
-          <div class="difficulty-info">
-            <span class="difficulty-dot easy"></span>
-            <span>Easy</span>
-          </div>
-
-          <strong>10</strong>
-
-        </div>
-
-
-        <div class="difficulty-row">
-
-          <div class="difficulty-info">
-            <span class="difficulty-dot medium"></span>
-            <span>Medium</span>
-          </div>
-
-          <strong>6</strong>
-
-        </div>
-
-
-        <div class="difficulty-row">
-
-          <div class="difficulty-info">
-            <span class="difficulty-dot hard"></span>
-            <span>Hard</span>
-          </div>
-
-          <strong>2</strong>
-
-        </div>
-
-      </div>
-
-
-      <div class="difficulty-total">
-
-        <span>Published Problems</span>
-
-        <strong>
-          {{ publishedProblems }}
-        </strong>
-
-      </div>
-
-    </mat-card>
-
-  </section>
-
-
-  <!-- Problem Performance -->
-
-  <mat-card class="panel-card problem-performance">
-
-    <div class="panel-header">
-
-      <div>
-        <h2>Problem Performance</h2>
-
-        <p>
-          Submission and acceptance statistics for individual problems.
-        </p>
-      </div>
-
-    </div>
-
-
-    <!-- Desktop -->
-
-    <div class="table-wrapper">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>Problem</th>
-            <th>Difficulty</th>
-            <th>Submissions</th>
-            <th>Accepted</th>
-            <th>Acceptance Rate</th>
-          </tr>
-
-        </thead>
-
-
-        <tbody>
+      @if (submissionStatuses.length > 0) {
+        <div class="status-list">
 
           @for (
-            problem of problemPerformance;
-            track problem.title
+            status of submissionStatuses;
+            track status.label
           ) {
+            <div class="status-item">
 
-            <tr>
+              <div class="status-heading">
+                <div class="status-name">
+                  <span
+                    class="status-dot"
+                    [class]="getStatusClass(status.label)">
+                  </span>
 
-              <td>
-                <strong>
-                  {{ problem.title }}
-                </strong>
-              </td>
-
-
-              <td>
-
-                <span
-                  class="difficulty-badge"
-                  [class]="getDifficultyClass(problem.difficulty)"
-                >
-                  {{ problem.difficulty }}
-                </span>
-
-              </td>
-
-
-              <td>
-                {{ problem.submissions }}
-              </td>
-
-
-              <td>
-                {{ problem.accepted }}
-              </td>
-
-
-              <td>
-
-                <div class="rate-cell">
-
-                  <strong>
-                    {{ problem.acceptanceRate }}%
-                  </strong>
-
-                  <mat-progress-bar
-                    mode="determinate"
-                    [value]="problem.acceptanceRate"
-                  ></mat-progress-bar>
-
+                  <strong>{{ status.label }}</strong>
                 </div>
 
-              </td>
+                <div class="status-value">
+                  <strong>{{ status.count }}</strong>
+                  <span>{{ status.percentage }}%</span>
+                </div>
+              </div>
 
-            </tr>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="status.percentage">
+              </mat-progress-bar>
 
+            </div>
           }
 
-        </tbody>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>analytics</mat-icon>
+          <p>No submissions available yet.</p>
+        </div>
+      }
+    </section>
 
-      </table>
+    <!-- Problem Difficulty -->
+    <section class="analytics-section">
 
-    </div>
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Problems</p>
+          <h2>Problem Difficulty</h2>
+        </div>
+      </div>
 
+      @if (totalDifficultyProblems > 0) {
 
-    <!-- Mobile -->
+        <div class="difficulty-list">
 
-    <div class="mobile-problems">
-
-      @for (
-        problem of problemPerformance;
-        track problem.title
-      ) {
-
-        <div class="problem-card">
-
-          <div class="problem-card-header">
-
-            <div>
-              <h3>
-                {{ problem.title }}
-              </h3>
-
-              <span
-                class="difficulty-badge"
-                [class]="getDifficultyClass(problem.difficulty)"
-              >
-                {{ problem.difficulty }}
-              </span>
+          <div class="difficulty-row">
+            <div class="difficulty-name">
+              <span class="difficulty-dot easy"></span>
+              <span>Easy</span>
             </div>
 
+            <strong>{{ difficultyCounts.easy }}</strong>
+          </div>
+
+          <div class="difficulty-progress">
+            <mat-progress-bar
+              mode="determinate"
+              [value]="getDifficultyPercentage('easy')">
+            </mat-progress-bar>
           </div>
 
 
-          <div class="problem-metrics">
-
-            <div>
-              <span>Submissions</span>
-              <strong>{{ problem.submissions }}</strong>
+          <div class="difficulty-row">
+            <div class="difficulty-name">
+              <span class="difficulty-dot medium"></span>
+              <span>Medium</span>
             </div>
 
-            <div>
-              <span>Accepted</span>
-              <strong>{{ problem.accepted }}</strong>
-            </div>
+            <strong>{{ difficultyCounts.medium }}</strong>
+          </div>
 
-            <div>
-              <span>Acceptance</span>
-              <strong>{{ problem.acceptanceRate }}%</strong>
-            </div>
-
+          <div class="difficulty-progress">
+            <mat-progress-bar
+              mode="determinate"
+              [value]="getDifficultyPercentage('medium')">
+            </mat-progress-bar>
           </div>
 
 
-          <mat-progress-bar
-            mode="determinate"
-            [value]="problem.acceptanceRate"
-          ></mat-progress-bar>
+          <div class="difficulty-row">
+            <div class="difficulty-name">
+              <span class="difficulty-dot hard"></span>
+              <span>Hard</span>
+            </div>
 
+            <strong>{{ difficultyCounts.hard }}</strong>
+          </div>
+
+          <div class="difficulty-progress">
+            <mat-progress-bar
+              mode="determinate"
+              [value]="getDifficultyPercentage('hard')">
+            </mat-progress-bar>
+          </div>
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <mat-icon>code_off</mat-icon>
+          <p>No problems available yet.</p>
         </div>
 
       }
 
-    </div>
+    </section>
 
-  </mat-card>
+    <!-- Problem Performance -->
+    <section class="analytics-section problem-performance">
+
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Performance</p>
+          <h2>Problem Performance</h2>
+        </div>
+      </div>
+
+      @if (problemPerformance.length > 0) {
+
+        <!-- Desktop -->
+        <div class="performance-table-wrapper">
+          <table class="performance-table">
+
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>Difficulty</th>
+                <th>Submissions</th>
+                <th>Accepted</th>
+                <th>Acceptance Rate</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (
+                problem of problemPerformance;
+                track problem.id
+              ) {
+                <tr>
+
+                  <td class="problem-title">
+                    {{ problem.title }}
+                  </td>
+
+                  <td>
+                    <span
+                      class="difficulty-badge"
+                      [class]="getDifficultyClass(problem.difficulty)">
+                      {{ problem.difficulty }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ problem.submissions }}
+                  </td>
+
+                  <td>
+                    {{ problem.accepted }}
+                  </td>
+
+                  <td class="acceptance-cell">
+                    <div class="acceptance-value">
+                      <strong>
+                        {{ getProblemAcceptanceRate(problem) }}%
+                      </strong>
+                    </div>
+
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="getProblemAcceptanceRate(problem)">
+                    </mat-progress-bar>
+                  </td>
+
+                </tr>
+              }
+
+            </tbody>
+
+          </table>
+        </div>
+
+        <!-- Mobile -->
+        <div class="mobile-performance-list">
+
+          @for (
+            problem of problemPerformance;
+            track problem.id
+          ) {
+            <mat-card class="problem-card">
+
+              <div class="problem-card-header">
+                <h3>{{ problem.title }}</h3>
+
+                <span
+                  class="difficulty-badge"
+                  [class]="getDifficultyClass(problem.difficulty)">
+                  {{ problem.difficulty }}
+                </span>
+              </div>
+
+              <div class="problem-card-stats">
+
+                <div>
+                  <span>Submissions</span>
+                  <strong>{{ problem.submissions }}</strong>
+                </div>
+
+                <div>
+                  <span>Accepted</span>
+                  <strong>{{ problem.accepted }}</strong>
+                </div>
+
+                <div>
+                  <span>Acceptance</span>
+                  <strong>
+                    {{ getProblemAcceptanceRate(problem) }}%
+                  </strong>
+                </div>
+
+              </div>
+
+              <mat-progress-bar
+                mode="determinate"
+                [value]="getProblemAcceptanceRate(problem)">
+              </mat-progress-bar>
+
+            </mat-card>
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <mat-icon>bar_chart</mat-icon>
+          <p>No problem performance data available yet.</p>
+        </div>
+
+      }
+
+    </section>
+
+  }
 
 </div>

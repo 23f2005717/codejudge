@@ -4,54 +4,33 @@
     <div>
       <h1>Problems</h1>
       <p>
-        Choose a problem and start solving it with Python.
+        Practice coding problems and improve your programming skills.
       </p>
     </div>
   </div>
 
-  <section class="filters-card">
+  <div class="filters-card">
 
-    <mat-form-field
-      appearance="outline"
-      class="search-field"
-    >
+    <mat-form-field appearance="outline">
       <mat-label>Search problems</mat-label>
-
-      <mat-icon matPrefix>
-        search
-      </mat-icon>
 
       <input
         matInput
         type="text"
         [(ngModel)]="searchTerm"
-        placeholder="Search by problem name"
+        placeholder="Search by title"
       />
 
-      <button
-        *ngIf="searchTerm"
-        mat-icon-button
-        matSuffix
-        type="button"
-        aria-label="Clear search"
-        (click)="searchTerm = ''"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-
+      <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
-    <mat-form-field
-      appearance="outline"
-      class="difficulty-field"
-    >
+    <mat-form-field appearance="outline">
       <mat-label>Difficulty</mat-label>
 
-      <mat-select
-        [(ngModel)]="selectedDifficulty"
-      >
+      <mat-select [(ngModel)]="selectedDifficulty">
+
         <mat-option value="all">
-          All difficulties
+          All Difficulties
         </mat-option>
 
         <mat-option value="easy">
@@ -65,27 +44,23 @@
         <mat-option value="hard">
           Hard
         </mat-option>
-      </mat-select>
 
+      </mat-select>
     </mat-form-field>
 
     <button
       mat-stroked-button
       type="button"
-      class="clear-button"
       (click)="clearFilters()"
-      [disabled]="
-        !searchTerm &&
-        selectedDifficulty === 'all'
-      "
     >
-      Clear
+      Clear Filters
     </button>
 
-  </section>
+  </div>
 
+  <!-- Loading state -->
   <div
-    class="loading-state"
+    class="state-container"
     *ngIf="isLoading"
   >
     <mat-spinner diameter="40"></mat-spinner>
@@ -93,13 +68,14 @@
     <p>Loading problems...</p>
   </div>
 
+  <!-- Error state -->
   <div
-    class="error-state"
+    class="state-container error-state"
     *ngIf="!isLoading && errorMessage"
   >
     <mat-icon>error_outline</mat-icon>
 
-    <h2>Unable to load problems</h2>
+    <h3>Unable to load problems</h3>
 
     <p>{{ errorMessage }}</p>
 
@@ -112,13 +88,10 @@
     </button>
   </div>
 
-  <section
+  <!-- Problems -->
+  <div
     class="problems-grid"
-    *ngIf="
-      !isLoading &&
-      !errorMessage &&
-      filteredProblems.length > 0
-    "
+    *ngIf="!isLoading && !errorMessage"
   >
 
     <article
@@ -137,20 +110,25 @@
           {{ getDifficultyLabel(problem.difficulty) }}
         </span>
 
+        <span class="problem-id">
+          #{{ problem.id }}
+        </span>
+
       </div>
 
       <h2>
         {{ problem.title }}
       </h2>
 
-      <p class="description">
+      <p class="problem-description">
         {{ problem.description }}
       </p>
 
       <div class="problem-card-footer">
 
-        <span class="problem-id">
-          Problem #{{ problem.id }}
+        <span class="problem-status">
+          <mat-icon>check_circle</mat-icon>
+          Published
         </span>
 
         <a
@@ -161,20 +139,18 @@
           ]"
         >
           Solve
-
-          <mat-icon>
-            arrow_forward
-          </mat-icon>
+          <mat-icon>arrow_forward</mat-icon>
         </a>
 
       </div>
 
     </article>
 
-  </section>
+  </div>
 
+  <!-- Empty state -->
   <div
-    class="empty-state"
+    class="state-container empty-state"
     *ngIf="
       !isLoading &&
       !errorMessage &&
@@ -182,25 +158,20 @@
     "
   >
 
-    <div class="empty-icon">
-      <mat-icon>search_off</mat-icon>
-    </div>
+    <mat-icon>assignment</mat-icon>
 
-    <h2>No problems found</h2>
-
-    <p *ngIf="problems.length > 0">
-      Try changing your search or difficulty filter.
-    </p>
+    <h3>No problems found</h3>
 
     <p *ngIf="problems.length === 0">
-      There are no published problems available yet.
+      There are no published problems available right now.
+    </p>
+
+    <p *ngIf="problems.length > 0">
+      No problems match your current filters.
     </p>
 
     <button
-      *ngIf="
-        searchTerm ||
-        selectedDifficulty !== 'all'
-      "
+      *ngIf="problems.length > 0"
       mat-stroked-button
       type="button"
       (click)="clearFilters()"

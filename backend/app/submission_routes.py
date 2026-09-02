@@ -1,5 +1,10 @@
 from flask import jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+
+from flask_jwt_extended import (
+    get_jwt,
+    get_jwt_identity,
+    jwt_required
+)
 
 from .extensions import db
 from .models.problem import Problem
@@ -9,12 +14,10 @@ from .utils.code_executor import run_python_code
 
 def register_submission_routes(app):
 
-    @app.post("/api/problems/<int:problem_id>/submit")
+    @app.post("/api/problems/<int:problem_id>/run")
     @jwt_required()
-    def submit_code(problem_id):
-        """Submit code for a problem."""
-
-        student_id = int(get_jwt_identity())
+    def run_code(problem_id):
+        """Run Python code against public/sample test cases."""
 
         problem = db.session.get(Problem, problem_id)
 
@@ -33,47 +36,36 @@ def register_submission_routes(app):
                 "message": "Code is required."
             }), 400
 
-        # We start with Python execution.
         if language.lower() != "python":
             return jsonify({
-                "message": "Currently only Python submissions are supported."
+                "message": "Currently only Python execution is supported."
             }), 400
 
-        submission = Submission(
-            code=code,
-            language="python",
-            status="pending",
-            score=0,
-            student_id=student_id,
-            problem_id=problem_id
-        )
+        sample_test_cases = [
+            test_case
+            for test_case in problem.test_cases
+            if test_case.is_sample
+        ]
 
-        db.session.add(submission)
-        db.session.commit()
-
-        test_cases = problem.test_cases
-
-        if not test_cases:
-            submission.status = "No Test Cases"
-            db.session.commit()
-
+        if not sample_test_cases:
             return jsonify({
-                "message": "Submission created, but this problem has no test cases.",
-                "submission": {
-                    "id": submission.id,
-                    "status": submission.status,
-                    "score": submission.score
+                "message": "This problem has no public test cases.",
+                "result": {
+                    "status": "No Test Cases",
+                    "passed_tests": 0,
+                    "total_tests": 0,
+                    "execution_time": 0,
+                    "error_message": None
                 }
             }), 200
 
         passed = 0
-        total = len(test_cases)
+        total = len(sample_test_cases)
         total_execution_time = 0
         final_status = "Accepted"
         final_error = None
 
-        for test_case in test_cases:
-
+        for test_case in sample_test_cases:
             result = run_python_code(
                 code,
                 test_case.input_data
@@ -101,15 +93,135 @@ def register_submission_routes(app):
                 passed += 1
             else:
                 final_status = "Wrong Answer"
+                final_error = (
+                    "Output does not match the expected result."
+                )
                 break
 
-        if final_status == "Accepted":
-            score = int((passed / total) * 100)
+        return jsonify({
+            "message": "Code executed successfully.",
+            "result": {
+                "status": final_status,
+                "passed_tests": passed,
+                "total_tests": total,
+                "execution_time": round(
+                    total_execution_time,
+                    4
+                ),
+                "error_message": final_error
+            }
+        }), 200
 
-            if passed != total:
+    @app.post("/api/problems/<int:problem_id>/submit")
+    @jwt_required()
+    def submit_code(problem_id):
+        """Submit code for a problem."""
+
+        student_id = int(get_jwt_identity())
+
+        problem = db.session.get(
+            Problem,
+            problem_id
+        )
+
+        if problem is None:
+            return jsonify({
+                "message": "Problem not found."
+            }), 404
+
+        data = request.get_json() or {}
+
+        code = data.get("code")
+        language = data.get("language", "python")
+
+        if not code:
+            return jsonify({
+                "message": "Code is required."
+            }), 400
+
+        if language.lower() != "python":
+            return jsonify({
+                "message": (
+                    "Currently only Python submissions "
+                    "are supported."
+                )
+            }), 400
+
+        submission = Submission(
+            code=code,
+            language="python",
+            status="pending",
+            score=0,
+            student_id=student_id,
+            problem_id=problem_id
+        )
+
+        db.session.add(submission)
+        db.session.commit()
+
+        test_cases = problem.test_cases
+
+        if not test_cases:
+            submission.status = "No Test Cases"
+            db.session.commit()
+
+            return jsonify({
+                "message": (
+                    "Submission created, but this problem "
+                    "has no test cases."
+                ),
+                "submission": {
+                    "id": submission.id,
+                    "status": submission.status,
+                    "score": submission.score
+                }
+            }), 200
+
+        passed = 0
+        total = len(test_cases)
+        total_execution_time = 0
+        final_status = "Accepted"
+        final_error = None
+
+        for test_case in test_cases:
+            result = run_python_code(
+                code,
+                test_case.input_data
+            )
+
+            total_execution_time += result["execution_time"]
+
+            if result["status"] == "Time Limit Exceeded":
+                final_status = "Time Limit Exceeded"
+                final_error = result["error_message"]
+                break
+
+            if result["status"] in [
+                "Runtime Error",
+                "Execution Error"
+            ]:
+                final_status = result["status"]
+                final_error = result["error_message"]
+                break
+
+            actual_output = result["output"].strip()
+            expected_output = test_case.expected_output.strip()
+
+            if actual_output == expected_output:
+                passed += 1
+            else:
                 final_status = "Wrong Answer"
-        else:
-            score = int((passed / total) * 100)
+                final_error = (
+                    "Output does not match the expected result."
+                )
+                break
+
+        score = int(
+            (passed / total) * 100
+        )
+
+        if passed != total and final_status == "Accepted":
+            final_status = "Wrong Answer"
 
         submission.status = final_status
         submission.score = score
@@ -156,8 +268,11 @@ def register_submission_routes(app):
                 "score": submission.score,
                 "execution_time": submission.execution_time,
                 "error_message": submission.error_message,
-                "created_at": submission.created_at.isoformat()
-                if submission.created_at else None
+                "created_at": (
+                    submission.created_at.isoformat()
+                    if submission.created_at
+                    else None
+                )
             })
 
         return jsonify({
@@ -184,7 +299,9 @@ def register_submission_routes(app):
 
         if submission.student_id != student_id:
             return jsonify({
-                "message": "You can only view your own submissions."
+                "message": (
+                    "You can only view your own submissions."
+                )
             }), 403
 
         return jsonify({
@@ -196,7 +313,63 @@ def register_submission_routes(app):
                 "score": submission.score,
                 "execution_time": submission.execution_time,
                 "error_message": submission.error_message,
-                "created_at": submission.created_at.isoformat()
-                if submission.created_at else None
+                "created_at": (
+                    submission.created_at.isoformat()
+                    if submission.created_at
+                    else None
+                )
             }
+        }), 200
+
+    @app.get("/api/instructor/submissions")
+    @jwt_required()
+    def get_instructor_submissions():
+        """Return submissions for problems owned by the instructor."""
+
+        claims = get_jwt()
+
+        if claims.get("role") != "instructor":
+            return jsonify({
+                "message": "Only instructors can view submissions."
+            }), 403
+
+        instructor_id = int(get_jwt_identity())
+
+        submissions = (
+            Submission.query
+            .join(
+                Problem,
+                Submission.problem_id == Problem.id
+            )
+            .filter(
+                Problem.instructor_id == instructor_id
+            )
+            .order_by(
+                Submission.created_at.desc()
+            )
+            .all()
+        )
+
+        result = []
+
+        for submission in submissions:
+            result.append({
+                "id": submission.id,
+                "student": submission.student.name,
+                "email": submission.student.email,
+                "problem": submission.problem.title,
+                "language": submission.language,
+                "status": submission.status,
+                "score": submission.score,
+                "execution_time": submission.execution_time,
+                "created_at": (
+                    submission.created_at.isoformat()
+                    if submission.created_at
+                    else None
+                )
+            })
+
+        return jsonify({
+            "count": len(result),
+            "submissions": result
         }), 200

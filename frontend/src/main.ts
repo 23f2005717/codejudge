@@ -1,36 +1,27 @@
-import {
-  bootstrapApplication
-} from '@angular/platform-browser';
-
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideZoneChangeDetection } from '@angular/core';
 import {
   provideHttpClient,
   withInterceptors
 } from '@angular/common/http';
-
-import {
-  provideRouter
-} from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 
-import {
-  authInterceptor
-} from './app/core/interceptors/auth.interceptor';
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideZoneChangeDetection(),
 
-bootstrapApplication(
-  AppComponent,
-  {
-    providers: [
-      provideRouter(routes),
+    provideRouter(routes),
 
-      provideHttpClient(
-        withInterceptors([
-          authInterceptor
-        ])
-      )
-    ]
-  }
-).catch(error => {
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor
+      ])
+    )
+  ]
+}).catch((error) => {
   console.error(error);
 });

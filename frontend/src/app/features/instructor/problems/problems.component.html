@@ -38,6 +38,7 @@
   <!-- Filters -->
   <section class="filters">
 
+    <!-- Search -->
     <mat-form-field
       appearance="outline"
       class="search-field">
@@ -54,6 +55,7 @@
         matInput
         type="text"
         [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
         placeholder="Search by title">
 
       @if (searchTerm) {
@@ -63,7 +65,7 @@
           matSuffix
           type="button"
           aria-label="Clear search"
-          (click)="searchTerm = ''">
+          (click)="clearSearch()">
 
           <mat-icon>
             close
@@ -76,6 +78,7 @@
     </mat-form-field>
 
 
+    <!-- Difficulty -->
     <mat-form-field
       appearance="outline"
       class="filter-field">
@@ -85,7 +88,8 @@
       </mat-label>
 
       <mat-select
-        [(ngModel)]="selectedDifficulty">
+        [(ngModel)]="selectedDifficulty"
+        (selectionChange)="onDifficultyChange()">
 
         <mat-option value="all">
           All difficulties
@@ -108,6 +112,7 @@
     </mat-form-field>
 
 
+    <!-- Status -->
     <mat-form-field
       appearance="outline"
       class="filter-field">
@@ -117,7 +122,8 @@
       </mat-label>
 
       <mat-select
-        [(ngModel)]="selectedStatus">
+        [(ngModel)]="selectedStatus"
+        (selectionChange)="onStatusChange()">
 
         <mat-option value="all">
           All statuses
@@ -136,6 +142,7 @@
     </mat-form-field>
 
 
+    <!-- Clear Filters -->
     @if (
       searchTerm ||
       selectedDifficulty !== 'all' ||
@@ -167,12 +174,36 @@
       </strong>
 
       <span>
-        {{ filteredProblems.length === 1 ? 'problem' : 'problems' }}
+        {{
+          filteredProblems.length === 1
+            ? 'problem'
+            : 'problems'
+        }}
       </span>
 
     </div>
 
   </div>
+
+
+  <!-- Error -->
+  @if (errorMessage) {
+
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+
+  }
+
+
+  <!-- Loading -->
+  @if (isLoading) {
+
+    <div class="loading-state">
+      Loading problems...
+    </div>
+
+  }
 
 
   <!-- Desktop Table -->
@@ -215,7 +246,10 @@
 
       <tbody>
 
-        @for (problem of filteredProblems; track problem.id) {
+        @for (
+          problem of filteredProblems;
+          track problem.id
+        ) {
 
           <tr>
 
@@ -232,7 +266,9 @@
 
               <span
                 class="difficulty"
-                [class]="getDifficultyClass(problem.difficulty)">
+                [class]="
+                  getDifficultyClass(problem.difficulty)
+                ">
 
                 {{ problem.difficulty }}
 
@@ -302,6 +338,7 @@
 
               <mat-menu #problemMenu="matMenu">
 
+                <!-- Edit -->
                 <button
                   mat-menu-item
                   type="button"
@@ -322,15 +359,17 @@
                 </button>
 
 
+                <!-- Publish / Unpublish -->
                 <button
                   mat-menu-item
                   type="button"
                   (click)="togglePublished(problem)">
 
                   <mat-icon>
-                    {{ problem.published
-                      ? 'visibility_off'
-                      : 'visibility'
+                    {{
+                      problem.published
+                        ? 'visibility_off'
+                        : 'visibility'
                     }}
                   </mat-icon>
 
@@ -345,6 +384,7 @@
                 </button>
 
 
+                <!-- Delete -->
                 <button
                   mat-menu-item
                   type="button"
@@ -368,40 +408,44 @@
 
         } @empty {
 
-          <tr>
+          @if (!isLoading) {
 
-            <td
-              colspan="6"
-              class="empty-state">
+            <tr>
 
-              <div class="empty-icon">
+              <td
+                colspan="6"
+                class="empty-state">
 
-                <mat-icon>
-                  search_off
-                </mat-icon>
+                <div class="empty-icon">
 
-              </div>
+                  <mat-icon>
+                    search_off
+                  </mat-icon>
 
-              <h3>
-                No problems found
-              </h3>
+                </div>
 
-              <p>
-                Try changing your search or filter options.
-              </p>
+                <h3>
+                  No problems found
+                </h3>
 
-              <button
-                mat-button
-                type="button"
-                (click)="clearFilters()">
+                <p>
+                  Try changing your search or filter options.
+                </p>
 
-                Clear filters
+                <button
+                  mat-button
+                  type="button"
+                  (click)="clearFilters()">
 
-              </button>
+                  Clear filters
 
-            </td>
+                </button>
 
-          </tr>
+              </td>
+
+            </tr>
+
+          }
 
         }
 
@@ -415,7 +459,10 @@
   <!-- Mobile Problem Cards -->
   <section class="mobile-problems">
 
-    @for (problem of filteredProblems; track problem.id) {
+    @for (
+      problem of filteredProblems;
+      track problem.id
+    ) {
 
       <article class="problem-card">
 
@@ -440,6 +487,7 @@
 
           <mat-menu #mobileProblemMenu="matMenu">
 
+            <!-- Edit -->
             <button
               mat-menu-item
               type="button"
@@ -460,15 +508,17 @@
             </button>
 
 
+            <!-- Publish / Unpublish -->
             <button
               mat-menu-item
               type="button"
               (click)="togglePublished(problem)">
 
               <mat-icon>
-                {{ problem.published
-                  ? 'visibility_off'
-                  : 'visibility'
+                {{
+                  problem.published
+                    ? 'visibility_off'
+                    : 'visibility'
                 }}
               </mat-icon>
 
@@ -483,6 +533,7 @@
             </button>
 
 
+            <!-- Delete -->
             <button
               mat-menu-item
               type="button"
@@ -507,7 +558,9 @@
 
           <span
             class="difficulty"
-            [class]="getDifficultyClass(problem.difficulty)">
+            [class]="
+              getDifficultyClass(problem.difficulty)
+            ">
 
             {{ problem.difficulty }}
 
@@ -572,30 +625,34 @@
 
     } @empty {
 
-      <div class="mobile-empty">
+      @if (!isLoading) {
 
-        <mat-icon>
-          search_off
-        </mat-icon>
+        <div class="mobile-empty">
 
-        <h3>
-          No problems found
-        </h3>
+          <mat-icon>
+            search_off
+          </mat-icon>
 
-        <p>
-          Try changing your search or filter options.
-        </p>
+          <h3>
+            No problems found
+          </h3>
 
-        <button
-          mat-button
-          type="button"
-          (click)="clearFilters()">
+          <p>
+            Try changing your search or filter options.
+          </p>
 
-          Clear filters
+          <button
+            mat-button
+            type="button"
+            (click)="clearFilters()">
 
-        </button>
+            Clear filters
 
-      </div>
+          </button>
+
+        </div>
+
+      }
 
     }
 

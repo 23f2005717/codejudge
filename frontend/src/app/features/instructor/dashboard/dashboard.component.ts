@@ -1,10 +1,30 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+import { forkJoin } from 'rxjs';
+
+import {
+  AnalyticsResponse,
+  AnalyticsService,
+  ProblemPerformance
+} from '../../../core/services/analytics.service';
+
+import {
+  Problem,
+  ProblemService
+} from '../../../core/services/problem.service';
+
 
 interface DashboardStat {
   label: string;
@@ -12,6 +32,7 @@ interface DashboardStat {
   icon: string;
   description: string;
 }
+
 
 interface RecentProblem {
   id: number;
@@ -21,11 +42,13 @@ interface RecentProblem {
   published: boolean;
 }
 
+
 interface SubmissionSummary {
   label: string;
   value: number;
   percentage: number;
 }
+
 
 @Component({
   selector: 'app-instructor-dashboard',
@@ -35,110 +58,214 @@ interface SubmissionSummary {
     RouterModule,
     MatButtonModule,
     MatCardModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
-  /*
-   * Temporary values for the UI.
-   * These will be replaced with API data when
-   * the instructor backend integration is added.
-   */
+  stats: DashboardStat[] = [];
 
-  stats: DashboardStat[] = [
-    {
-      label: 'Total Problems',
-      value: 24,
-      icon: 'code',
-      description: 'Problems created'
-    },
-    {
-      label: 'Published Problems',
-      value: 18,
-      icon: 'public',
-      description: 'Visible to students'
-    },
-    {
-      label: 'Total Submissions',
-      value: 486,
-      icon: 'assignment',
-      description: 'Student submissions'
-    },
-    {
-      label: 'Accepted Submissions',
-      value: 312,
-      icon: 'check_circle',
-      description: 'Successfully accepted'
+  recentProblems: RecentProblem[] = [];
+
+  submissionSummary: SubmissionSummary[] = [];
+
+  isLoading = false;
+
+  errorMessage = '';
+
+
+  constructor(
+    private readonly analyticsService: AnalyticsService,
+    private readonly problemService: ProblemService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
+
+
+  ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+
+  loadDashboard(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    forkJoin({
+      analytics: this.analyticsService.getInstructorAnalytics(),
+      problems: this.problemService.getProblems()
+    }).subscribe({
+
+      next: response => {
+        this.applyDashboardData(
+          response.analytics,
+          response.problems.problems
+        );
+
+        this.isLoading = false;
+
+        this.cdr.detectChanges();
+      },
+
+      error: error => {
+        console.error(
+          'Instructor dashboard API error:',
+          error
+        );
+
+        this.resetDashboard();
+
+        this.isLoading = false;
+
+        this.errorMessage =
+          error?.error?.message ??
+          'Unable to load dashboard. Please try again.';
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
+  private applyDashboardData(
+    analytics: AnalyticsResponse,
+    problems: Problem[]
+  ): void {
+
+    const acceptedCount =
+      this.getStatusCount(
+        analytics,
+        'Accepted'
+      );
+
+
+    this.stats = [
+      {
+        label: 'Total Problems',
+        value: analytics.totalProblems,
+        icon: 'code',
+        description: 'Problems created'
+      },
+
+      {
+        label: 'Published Problems',
+        value: analytics.publishedProblems,
+        icon: 'public',
+        description: 'Visible to students'
+      },
+
+      {
+        label: 'Total Submissions',
+        value: analytics.totalSubmissions,
+        icon: 'assignment',
+        description: 'Student submissions'
+      },
+
+      {
+        label: 'Accepted Submissions',
+        value: acceptedCount,
+        icon: 'check_circle',
+        description: 'Successfully accepted'
+      }
+    ];
+
+
+    const performanceMap =
+      new Map<number, ProblemPerformance>();
+
+
+    for (
+      const performance
+      of analytics.problemPerformance
+    ) {
+      performanceMap.set(
+        performance.id,
+        performance
+      );
     }
-  ];
 
-  recentProblems: RecentProblem[] = [
-    {
-      id: 1,
-      title: 'Two Sum',
-      difficulty: 'Easy',
-      submissions: 86,
-      published: true
-    },
-    {
-      id: 2,
-      title: 'Binary Search',
-      difficulty: 'Easy',
-      submissions: 64,
-      published: true
-    },
-    {
-      id: 3,
-      title: 'Longest Substring Without Repeating Characters',
-      difficulty: 'Medium',
-      submissions: 52,
-      published: true
-    },
-    {
-      id: 4,
-      title: 'Merge Intervals',
-      difficulty: 'Medium',
-      submissions: 41,
-      published: true
-    },
-    {
-      id: 5,
-      title: 'Graph Shortest Path',
-      difficulty: 'Hard',
-      submissions: 27,
-      published: false
-    }
-  ];
 
-  submissionSummary: SubmissionSummary[] = [
-    {
-      label: 'Accepted',
-      value: 312,
-      percentage: 64
-    },
-    {
-      label: 'Wrong Answer',
-      value: 109,
-      percentage: 22
-    },
-    {
-      label: 'Runtime Error',
-      value: 38,
-      percentage: 8
-    },
-    {
-      label: 'Time Limit',
-      value: 27,
-      percentage: 6
+    this.recentProblems = problems
+      .slice(0, 5)
+      .map(problem => {
+
+        const performance =
+          performanceMap.get(problem.id);
+
+        return {
+          id: problem.id,
+          title: problem.title,
+          difficulty:
+            this.formatDifficulty(
+              problem.difficulty
+            ),
+          submissions:
+            performance?.submissions ?? 0,
+          published:
+            problem.is_published
+        };
+      });
+
+
+    this.submissionSummary =
+      analytics.submissionStatuses.map(
+        status => ({
+          label: status.label,
+          value: status.count,
+          percentage: status.percentage
+        })
+      );
+  }
+
+
+  private resetDashboard(): void {
+    this.stats = [];
+    this.recentProblems = [];
+    this.submissionSummary = [];
+  }
+
+
+  private getStatusCount(
+    analytics: AnalyticsResponse,
+    status: string
+  ): number {
+
+    const item =
+      analytics.submissionStatuses.find(
+        entry => entry.label === status
+      );
+
+    return item?.count ?? 0;
+  }
+
+
+  private formatDifficulty(
+    difficulty: string
+  ): 'Easy' | 'Medium' | 'Hard' {
+
+    switch (difficulty.toLowerCase()) {
+
+      case 'easy':
+        return 'Easy';
+
+      case 'medium':
+        return 'Medium';
+
+      case 'hard':
+        return 'Hard';
+
+      default:
+        return 'Easy';
     }
-  ];
+  }
+
 
   getDifficultyClass(
     difficulty: RecentProblem['difficulty']
   ): string {
+
     return difficulty.toLowerCase();
   }
 }

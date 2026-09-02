@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +47,8 @@ export class ProblemsComponent implements OnInit {
   errorMessage = '';
 
   constructor(
-    private readonly problemService: ProblemService
+    private readonly problemService: ProblemService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -56,27 +61,34 @@ export class ProblemsComponent implements OnInit {
 
     this.problemService.getProblems().subscribe({
       next: response => {
+        console.log('Student Problems API response:', response);
+
         this.problems = response.problems.filter(
           problem => problem.is_published
         );
 
         this.isLoading = false;
+
+        // Angular 22 change-detection fix.
+        this.cdr.detectChanges();
       },
 
       error: error => {
-        this.isLoading = false;
+        console.error('Student Problems API error:', error);
 
+        this.isLoading = false;
         this.errorMessage =
           error?.error?.message ??
           'Unable to load problems. Please try again.';
+
+        // Angular 22 change-detection fix.
+        this.cdr.detectChanges();
       }
     });
   }
 
   get filteredProblems(): Problem[] {
-    const search = this.searchTerm
-      .trim()
-      .toLowerCase();
+    const search = this.searchTerm.trim().toLowerCase();
 
     return this.problems.filter(problem => {
       const matchesSearch =
@@ -99,7 +111,9 @@ export class ProblemsComponent implements OnInit {
   getDifficultyLabel(
     difficulty: ProblemDifficulty
   ): string {
-    return difficulty.charAt(0).toUpperCase()
-      + difficulty.slice(1);
+    return (
+      difficulty.charAt(0).toUpperCase() +
+      difficulty.slice(1)
+    );
   }
 }

@@ -1,5 +1,9 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -8,8 +12,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+import {
+  InstructorSubmission,
+  SubmissionService
+} from '../../../core/services/submission.service';
 
 interface Submission {
   id: number;
@@ -17,7 +26,7 @@ interface Submission {
   email: string;
   problem: string;
   language: string;
-  status: 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit';
+  status: string;
   executionTime: string;
   submittedAt: string;
 }
@@ -34,125 +43,165 @@ interface Submission {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatMenuModule,
-    MatSelectModule
+    MatSelectModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './submissions.component.html',
   styleUrl: './submissions.component.scss'
 })
-export class SubmissionsComponent {
+export class SubmissionsComponent implements OnInit {
+
+  submissions: Submission[] = [];
+
   searchTerm = '';
   selectedStatus = 'All';
   selectedLanguage = 'All';
+
+  isLoading = false;
+  errorMessage = '';
 
   readonly statuses = [
     'All',
     'Accepted',
     'Wrong Answer',
     'Runtime Error',
+    'Execution Error',
     'Time Limit'
   ];
 
   readonly languages = [
     'All',
-    'Python',
-    'Java',
-    'C++',
-    'JavaScript'
+    'Python'
   ];
 
-  submissions: Submission[] = [
-    {
-      id: 1001,
-      student: 'Arun Kumar',
-      email: 'arun@example.com',
-      problem: 'Two Sum',
-      language: 'Python',
-      status: 'Accepted',
-      executionTime: '42 ms',
-      submittedAt: 'Sep 2, 2026 10:32 AM'
-    },
-    {
-      id: 1002,
-      student: 'Priya Sharma',
-      email: 'priya@example.com',
-      problem: 'Binary Search',
-      language: 'Java',
-      status: 'Accepted',
-      executionTime: '31 ms',
-      submittedAt: 'Sep 2, 2026 10:18 AM'
-    },
-    {
-      id: 1003,
-      student: 'Rahul Verma',
-      email: 'rahul@example.com',
-      problem: 'Two Sum',
-      language: 'C++',
-      status: 'Wrong Answer',
-      executionTime: '28 ms',
-      submittedAt: 'Sep 2, 2026 09:54 AM'
-    },
-    {
-      id: 1004,
-      student: 'Sneha Patel',
-      email: 'sneha@example.com',
-      problem: 'Longest Substring Without Repeating Characters',
-      language: 'Python',
-      status: 'Accepted',
-      executionTime: '67 ms',
-      submittedAt: 'Sep 2, 2026 09:41 AM'
-    },
-    {
-      id: 1005,
-      student: 'Vikram Singh',
-      email: 'vikram@example.com',
-      problem: 'Merge Intervals',
-      language: 'JavaScript',
-      status: 'Runtime Error',
-      executionTime: '19 ms',
-      submittedAt: 'Sep 2, 2026 09:27 AM'
-    },
-    {
-      id: 1006,
-      student: 'Ananya Rao',
-      email: 'ananya@example.com',
-      problem: 'Binary Search',
-      language: 'C++',
-      status: 'Accepted',
-      executionTime: '24 ms',
-      submittedAt: 'Sep 2, 2026 09:12 AM'
-    },
-    {
-      id: 1007,
-      student: 'Karan Mehta',
-      email: 'karan@example.com',
-      problem: 'Graph Shortest Path',
-      language: 'Java',
-      status: 'Time Limit',
-      executionTime: '2001 ms',
-      submittedAt: 'Sep 2, 2026 08:56 AM'
-    },
-    {
-      id: 1008,
-      student: 'Meera Nair',
-      email: 'meera@example.com',
-      problem: 'Valid Parentheses',
-      language: 'Python',
-      status: 'Accepted',
-      executionTime: '35 ms',
-      submittedAt: 'Sep 2, 2026 08:43 AM'
+  constructor(
+    private readonly submissionService: SubmissionService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadSubmissions();
+  }
+
+  loadSubmissions(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.submissionService.getInstructorSubmissions().subscribe({
+      next: response => {
+        this.submissions = response.submissions.map(
+          submission => this.mapSubmission(submission)
+        );
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+
+      error: error => {
+        console.error(
+          'Instructor submissions API error:',
+          error
+        );
+
+        this.submissions = [];
+        this.isLoading = false;
+
+        this.errorMessage =
+          error?.error?.message ??
+          'Unable to load submissions. Please try again.';
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private mapSubmission(
+    submission: InstructorSubmission
+  ): Submission {
+    return {
+      id: submission.id,
+      student: submission.student,
+      email: submission.email,
+      problem: submission.problem,
+      language: this.formatLanguage(
+        submission.language
+      ),
+      status: this.formatStatus(
+        submission.status
+      ),
+      executionTime: this.formatExecutionTime(
+        submission.execution_time
+      ),
+      submittedAt: this.formatDate(
+        submission.created_at
+      )
+    };
+  }
+
+  private formatLanguage(language: string): string {
+    if (!language) {
+      return '—';
     }
-  ];
+
+    return (
+      language.charAt(0).toUpperCase() +
+      language.slice(1).toLowerCase()
+    );
+  }
+
+  private formatStatus(status: string): string {
+    if (status === 'Time Limit Exceeded') {
+      return 'Time Limit';
+    }
+
+    return status || '—';
+  }
+
+  private formatExecutionTime(
+    executionTime: number | null
+  ): string {
+    if (
+      executionTime === null ||
+      executionTime === undefined
+    ) {
+      return '—';
+    }
+
+    return `${(executionTime * 1000).toFixed(2)} ms`;
+  }
+
+  private formatDate(
+    createdAt: string | null
+  ): string {
+    if (!createdAt) {
+      return '—';
+    }
+
+    const date = new Date(createdAt);
+
+    if (Number.isNaN(date.getTime())) {
+      return '—';
+    }
+
+    return date.toLocaleString();
+  }
 
   get filteredSubmissions(): Submission[] {
-    const query = this.searchTerm.trim().toLowerCase();
+    const search =
+      this.searchTerm.trim().toLowerCase();
 
     return this.submissions.filter(submission => {
       const matchesSearch =
-        !query ||
-        submission.student.toLowerCase().includes(query) ||
-        submission.email.toLowerCase().includes(query) ||
-        submission.problem.toLowerCase().includes(query);
+        !search ||
+        submission.student
+          .toLowerCase()
+          .includes(search) ||
+        submission.email
+          .toLowerCase()
+          .includes(search) ||
+        submission.problem
+          .toLowerCase()
+          .includes(search);
 
       const matchesStatus =
         this.selectedStatus === 'All' ||
@@ -162,33 +211,43 @@ export class SubmissionsComponent {
         this.selectedLanguage === 'All' ||
         submission.language === this.selectedLanguage;
 
-      return matchesSearch && matchesStatus && matchesLanguage;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesLanguage
+      );
     });
+  }
+
+  get totalCount(): number {
+    return this.submissions.length;
   }
 
   get acceptedCount(): number {
     return this.submissions.filter(
-      submission => submission.status === 'Accepted'
+      submission =>
+        submission.status === 'Accepted'
     ).length;
   }
 
   get failedCount(): number {
     return this.submissions.filter(
-      submission => submission.status !== 'Accepted'
+      submission =>
+        submission.status !== 'Accepted'
     ).length;
   }
 
   get acceptanceRate(): number {
-    if (this.submissions.length === 0) {
+    if (this.totalCount === 0) {
       return 0;
     }
 
     return Math.round(
-      (this.acceptedCount / this.submissions.length) * 100
+      (this.acceptedCount / this.totalCount) * 100
     );
   }
 
-  getStatusClass(status: Submission['status']): string {
+  getStatusClass(status: string): string {
     switch (status) {
       case 'Accepted':
         return 'accepted';
@@ -198,6 +257,9 @@ export class SubmissionsComponent {
 
       case 'Runtime Error':
         return 'runtime-error';
+
+      case 'Execution Error':
+        return 'execution-error';
 
       case 'Time Limit':
         return 'time-limit';

@@ -1,8 +1,10 @@
 <div class="submissions-page">
 
   <div class="page-header">
+
     <div>
       <h1>Submission History</h1>
+
       <p>
         View your previous code submissions and their results.
       </p>
@@ -15,14 +17,62 @@
       <mat-icon>code</mat-icon>
       Browse Problems
     </a>
+
   </div>
 
-  <section class="submissions-card">
+  <!-- Loading -->
+
+  <section
+    *ngIf="isLoading"
+    class="state-card"
+  >
+    <mat-spinner diameter="40"></mat-spinner>
+
+    <p>
+      Loading submission history...
+    </p>
+  </section>
+
+  <!-- Error -->
+
+  <section
+    *ngIf="!isLoading && errorMessage"
+    class="state-card error-state"
+  >
+    <div class="state-icon">
+      <mat-icon>error_outline</mat-icon>
+    </div>
+
+    <h2>
+      Unable to load submissions
+    </h2>
+
+    <p>
+      {{ errorMessage }}
+    </p>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="loadSubmissions()"
+    >
+      Try Again
+    </button>
+  </section>
+
+  <!-- Submission Table -->
+
+  <section
+    *ngIf="!isLoading && !errorMessage"
+    class="submissions-card"
+  >
 
     <div
       class="table-container"
       *ngIf="submissions.length > 0; else emptyState"
     >
+
       <table>
 
         <thead>
@@ -30,75 +80,92 @@
             <th>Problem</th>
             <th>Status</th>
             <th>Score</th>
-            <th>Tests</th>
+            <th>Language</th>
             <th>Runtime</th>
-            <th>Memory</th>
             <th>Submitted</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let submission of submissions">
+
+          <tr
+            *ngFor="let submission of submissions"
+          >
 
             <td>
               <div class="problem-cell">
-                <span class="problem-title">
+
+                <a
+                  class="problem-title"
+                  [routerLink]="[
+                    '/student/problems',
+                    submission.problemId
+                  ]"
+                >
                   {{ submission.problemTitle }}
-                </span>
+                </a>
 
                 <span class="submission-id">
                   Submission #{{ submission.id }}
                 </span>
+
               </div>
             </td>
 
             <td>
               <span
                 class="status"
-                [ngClass]="getStatusClass(submission.status)"
+                [ngClass]="
+                  getStatusClass(submission.status)
+                "
               >
                 {{ getStatusLabel(submission.status) }}
               </span>
             </td>
 
             <td>
-              {{ submission.score }}/100
+              <strong>
+                {{ submission.score }}/100
+              </strong>
             </td>
 
             <td>
-              {{ submission.passedTests }}/{{ submission.totalTests }}
+              {{ submission.language }}
             </td>
 
             <td>
-              {{ submission.runtime }}s
+              {{ formatRuntime(submission.executionTime) }}
             </td>
 
             <td>
-              {{ submission.memory }} MB
-            </td>
-
-            <td>
-              {{ submission.submittedAt }}
+              {{ formatDate(submission.submittedAt) }}
             </td>
 
           </tr>
+
         </tbody>
 
       </table>
+
     </div>
 
+    <!-- Empty -->
+
     <ng-template #emptyState>
+
       <div class="empty-state">
 
         <div class="empty-icon">
           <mat-icon>history</mat-icon>
         </div>
 
-        <h2>No submissions yet</h2>
+        <h2>
+          No submissions yet
+        </h2>
 
         <p>
-          Your submitted solutions will appear here after you
-          submit a solution to a problem.
+          Your submitted solutions will appear here after
+          you submit a solution to a problem.
         </p>
 
         <a
@@ -109,6 +176,7 @@
         </a>
 
       </div>
+
     </ng-template>
 
   </section>

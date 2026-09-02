@@ -1,16 +1,22 @@
 from flask import Flask, jsonify, request
+
 from flask_jwt_extended import create_access_token
 
 from .config import Config
 from .extensions import cors, db, jwt
+
 from .models.user import User
 from .models.problem import Problem
 from .models.testcase import TestCase
 from .models.submission import Submission
+
 from .utils.auth import hash_password, check_password
+
 from .problem_routes import register_problem_routes
 from .testcase_routes import register_testcase_routes
 from .submission_routes import register_submission_routes
+from .routes.analytics import register_analytics_routes
+from .routes.leaderboard import register_leaderboard_routes
 
 
 def create_app(config_class=Config):
@@ -36,14 +42,12 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
-
     @app.get("/api/health")
     def health():
         return jsonify({
             "status": "ok",
             "service": "codejudge-backend"
         })
-
 
     @app.post("/api/auth/register")
     def register():
@@ -66,7 +70,9 @@ def create_app(config_class=Config):
             }), 400
 
         # Check whether the email already exists.
-        existing_user = User.query.filter_by(email=email).first()
+        existing_user = User.query.filter_by(
+            email=email
+        ).first()
 
         if existing_user:
             return jsonify({
@@ -94,7 +100,6 @@ def create_app(config_class=Config):
             }
         }), 201
 
-
     @app.post("/api/auth/login")
     def login():
         data = request.get_json() or {}
@@ -109,7 +114,9 @@ def create_app(config_class=Config):
             }), 400
 
         # Find the user.
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(
+            email=email
+        ).first()
 
         # Check the password.
         if not user or not check_password(
@@ -140,10 +147,11 @@ def create_app(config_class=Config):
             }
         }), 200
 
-
-
+    # Register application routes.
     register_problem_routes(app)
     register_testcase_routes(app)
     register_submission_routes(app)
+    register_analytics_routes(app)
+    register_leaderboard_routes(app)
 
     return app

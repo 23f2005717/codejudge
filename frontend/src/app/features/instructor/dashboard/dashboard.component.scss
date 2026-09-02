@@ -1,457 +1,512 @@
-.dashboard {
+.dashboard-page {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 28px 32px 40px;
+  padding: 8px 0 40px;
   box-sizing: border-box;
 }
 
-/* --------------------------------
-   Page header
--------------------------------- */
+/* ---------------------------------
+   Page Header
+--------------------------------- */
 
 .page-header {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 28px;
+
+  .eyebrow {
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+  }
+
+  h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 34px;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 16px;
+  }
 }
 
-.header-content {
-  min-width: 0;
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.page-header h1 {
-  margin: 0;
-  color: #111827;
-  font-size: 30px;
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-.subtitle {
-  margin: 8px 0 0;
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.page-header a {
+.create-problem-button {
   flex-shrink: 0;
+  margin-top: 20px;
+  font-size: 15px;
+
+  mat-icon {
+    margin-right: 6px;
+    font-size: 20px;
+  }
 }
 
-.page-header a mat-icon {
-  margin-right: 4px;
-  vertical-align: middle;
+/* ---------------------------------
+   Loading / Error
+--------------------------------- */
+
+.state-container {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-sizing: border-box;
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+  }
 }
 
+.error-state {
+  color: #475569;
 
-/* --------------------------------
-   Statistics
--------------------------------- */
+  mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+  }
+
+  h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    max-width: 500px;
+    text-align: center;
+  }
+}
+
+/* ---------------------------------
+   Statistics Cards
+--------------------------------- */
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-
-  padding: 20px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-
-  box-shadow: none;
-}
-
-.stat-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 10px;
-  background: #f3f4f6;
-}
-
-.stat-icon mat-icon {
-  width: 22px;
-  height: 22px;
-  font-size: 22px;
-}
-
-.stat-content {
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.stat-content strong {
-  margin: 3px 0;
-
-  color: #111827;
-  font-size: 25px;
-  line-height: 1.2;
-}
-
-.stat-description {
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-
-/* --------------------------------
-   Main panels
--------------------------------- */
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.8fr);
-  gap: 20px;
+  gap: 18px;
   margin-bottom: 28px;
 }
 
-.panel {
-  overflow: hidden;
-
-  border: 1px solid #e5e7eb;
+.stat-card {
+  min-height: 170px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-
+  background: #ffffff;
   box-shadow: none;
-}
-
-.panel-header {
+  box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-
-  padding: 20px;
-
-  border-bottom: 1px solid #f0f0f0;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.panel-header h2,
-.section-header h2 {
-  margin: 0;
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: #f8fafc;
 
-  color: #111827;
-  font-size: 17px;
-  font-weight: 650;
+  mat-icon {
+    color: #1e293b;
+    font-size: 22px;
+  }
 }
 
-.panel-header p,
-.section-header p {
-  margin: 5px 0 0;
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  color: #6b7280;
+.stat-label {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.stat-value {
+  margin-top: 4px;
+  color: #0f172a;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.stat-description {
+  margin-top: 4px;
+  color: #94a3b8;
   font-size: 13px;
 }
 
-.panel-header a {
-  flex-shrink: 0;
+/* ---------------------------------
+   Main Dashboard Grid
+--------------------------------- */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.9fr);
+  gap: 22px;
+  align-items: stretch;
 }
 
-.panel-header a mat-icon {
-  width: 17px;
-  height: 17px;
-  margin-left: 3px;
+/* ---------------------------------
+   Dashboard Cards
+--------------------------------- */
 
-  font-size: 17px;
-
-  vertical-align: middle;
+.dashboard-card {
+  min-width: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: none;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-
-/* --------------------------------
-   Recent problems
--------------------------------- */
-
-.problem-list {
-  padding: 4px 20px;
-}
-
-.problem-row {
-  min-height: 72px;
-
+.card-header {
+  min-height: 88px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #e2e8f0;
+  box-sizing: border-box;
 
-  gap: 16px;
+  h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 19px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
 
-  border-bottom: 1px solid #f0f0f0;
+  p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 14px;
+  }
 }
 
-.problem-row:last-child {
-  border-bottom: 0;
+.view-all-link {
+  flex-shrink: 0;
+
+  mat-icon {
+    margin-left: 5px;
+    font-size: 18px;
+  }
 }
 
-.problem-info {
+/* ---------------------------------
+   Recent Problems
+--------------------------------- */
+
+.problem-list {
+  padding: 0 22px;
+}
+
+.problem-row {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #edf2f7;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.problem-information {
   min-width: 0;
 }
 
 .problem-title {
+  display: block;
+  max-width: 100%;
   overflow: hidden;
-
-  color: #1f2937;
-  font-size: 14px;
+  color: #0f172a;
+  font-size: 15px;
+  line-height: 1.4;
   font-weight: 600;
-
+  text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &:hover {
+    color: #2563eb;
+  }
 }
 
 .problem-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
-
+  gap: 12px;
   margin-top: 7px;
 }
 
 .difficulty {
   display: inline-flex;
   align-items: center;
-
-  padding: 4px 8px;
-
+  padding: 3px 9px;
   border-radius: 999px;
-
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-}
 
-.difficulty.easy {
-  color: #15803d;
-  background: #ecfdf3;
-}
+  &.easy {
+    color: #15803d;
+    background: #f0fdf4;
+  }
 
-.difficulty.medium {
-  color: #b45309;
-  background: #fffbeb;
-}
+  &.medium {
+    color: #b45309;
+    background: #fffbeb;
+  }
 
-.difficulty.hard {
-  color: #b91c1c;
-  background: #fef2f2;
+  &.hard {
+    color: #dc2626;
+    background: #fef2f2;
+  }
 }
 
 .submission-count {
-  color: #9ca3af;
-  font-size: 12px;
+  color: #94a3b8;
+  font-size: 13px;
 }
 
-.status {
+.publication-status {
   flex-shrink: 0;
-
-  padding: 4px 8px;
-
-  border-radius: 999px;
-
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+
+  &.published {
+    color: #15803d;
+  }
+
+  &.draft {
+    color: #64748b;
+  }
 }
 
-.status.published {
-  color: #15803d;
-  background: #ecfdf3;
+/* ---------------------------------
+   Submission Summary
+--------------------------------- */
+
+.submission-summary {
+  padding: 20px 22px 24px;
 }
 
-.status.draft {
-  color: #6b7280;
-  background: #f3f4f6;
+.summary-item {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
-
-/* --------------------------------
-   Submission summary
--------------------------------- */
-
-.submission-list {
-  padding: 20px;
-}
-
-.submission-item {
-  margin-bottom: 19px;
-}
-
-.submission-item:last-child {
-  margin-bottom: 0;
-}
-
-.submission-header {
+.summary-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  gap: 16px;
   margin-bottom: 7px;
-
-  color: #4b5563;
-  font-size: 13px;
 }
 
-.submission-header strong {
-  color: #111827;
-  font-size: 13px;
+.summary-label {
+  color: #475569;
+  font-size: 14px;
+}
+
+.summary-value {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .progress-track {
   width: 100%;
-  height: 7px;
-
+  height: 8px;
   overflow: hidden;
-
   border-radius: 999px;
-  background: #f0f0f0;
+  background: #f1f5f9;
 }
 
 .progress-bar {
   height: 100%;
-
+  min-width: 0;
   border-radius: inherit;
-
-  background: #374151;
+  transition: width 0.25s ease;
 }
 
-.percentage {
-  display: block;
+.accepted-progress {
+  background: #334155;
+}
 
+.wrong-progress {
+  background: #94a3b8;
+}
+
+.runtime-progress {
+  background: #cbd5e1;
+}
+
+.time-limit-progress {
+  background: #e2e8f0;
+}
+
+.summary-percentage {
   margin-top: 4px;
-
-  color: #9ca3af;
-  font-size: 11px;
+  color: #94a3b8;
+  font-size: 12px;
   text-align: right;
 }
 
+/* ---------------------------------
+   Empty State
+--------------------------------- */
 
-/* --------------------------------
-   Quick actions
--------------------------------- */
+.empty-state {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+  box-sizing: border-box;
 
-.quick-actions {
-  margin-top: 4px;
+  mat-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 10px;
+    color: #94a3b8;
+    font-size: 36px;
+  }
+
+  h3 {
+    margin: 0;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  p {
+    max-width: 320px;
+    margin: 7px 0 18px;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  &.compact {
+    min-height: 180px;
+
+    p {
+      margin-bottom: 0;
+    }
+  }
 }
 
-.section-header {
-  margin-bottom: 14px;
+/* ---------------------------------
+   Quick Actions
+--------------------------------- */
+
+.quick-actions-section {
+  margin-top: 28px;
+
+  > h2 {
+    margin: 0 0 14px;
+    color: #0f172a;
+    font-size: 19px;
+    font-weight: 600;
+  }
 }
 
-.action-grid {
+.quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
-.action-card {
-  min-width: 0;
-
+.quick-action {
+  min-height: 76px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 14px;
+  padding: 14px 16px;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  text-align: left;
+  box-sizing: border-box;
 
-  padding: 17px;
+  > mat-icon:first-child {
+    flex-shrink: 0;
+    color: #334155;
+  }
 
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  > span {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
 
-  background: #ffffff;
+  strong {
+    font-size: 14px;
+    font-weight: 600;
+  }
 
-  text-decoration: none;
+  small {
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.4;
+  }
 
-  transition:
-    border-color 0.15s ease,
-    transform 0.15s ease;
+  .action-arrow {
+    flex-shrink: 0;
+    color: #64748b;
+    font-size: 18px;
+  }
+
+  &:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
 }
 
-.action-card:hover {
-  border-color: #cbd5e1;
-  transform: translateY(-1px);
-}
-
-.action-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 9px;
-  background: #f3f4f6;
-}
-
-.action-icon mat-icon {
-  width: 20px;
-  height: 20px;
-
-  font-size: 20px;
-}
-
-.action-content {
-  min-width: 0;
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.action-content strong {
-  color: #1f2937;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.action-content small {
-  overflow: hidden;
-
-  margin-top: 3px;
-
-  color: #6b7280;
-  font-size: 11px;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.action-arrow {
-  flex-shrink: 0;
-
-  color: #9ca3af;
-}
-
-
-/* --------------------------------
-   Tablet
--------------------------------- */
+/* ---------------------------------
+   Responsive
+--------------------------------- */
 
 @media (max-width: 1100px) {
-
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -460,68 +515,78 @@
     grid-template-columns: 1fr;
   }
 
-  .action-grid {
+  .quick-actions-grid {
     grid-template-columns: 1fr;
   }
 }
 
-
-/* --------------------------------
-   Mobile
--------------------------------- */
-
 @media (max-width: 700px) {
-
-  .dashboard {
-    padding: 20px 16px 32px;
+  .dashboard-page {
+    padding: 4px 0 28px;
   }
 
   .page-header {
-    align-items: stretch;
     flex-direction: column;
-    gap: 16px;
+    margin-bottom: 22px;
 
-    margin-bottom: 20px;
+    h1 {
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 14px;
+    }
   }
 
-  .page-header h1 {
-    font-size: 26px;
-  }
-
-  .page-header a {
-    width: 100%;
+  .create-problem-button {
+    margin-top: 0;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+    margin-bottom: 18px;
   }
 
   .stat-card {
-    padding: 16px;
+    min-height: 145px;
   }
 
-  .panel-header {
-    padding: 17px 16px 14px;
+  .dashboard-grid {
+    gap: 16px;
+  }
+
+  .card-header {
+    align-items: flex-start;
+    padding: 18px;
+
+    h2 {
+      font-size: 17px;
+    }
   }
 
   .problem-list {
-    padding: 4px 16px;
+    padding: 0 18px;
   }
 
   .problem-row {
-    min-height: 68px;
+    min-height: 82px;
+    gap: 12px;
   }
 
-  .status {
-    display: none;
+  .problem-title {
+    white-space: normal;
   }
 
-  .submission-list {
-    padding: 16px;
+  .publication-status {
+    align-self: center;
   }
 
-  .action-card {
-    padding: 15px;
+  .submission-summary {
+    padding: 18px;
+  }
+
+  .quick-actions-grid {
+    gap: 10px;
   }
 }

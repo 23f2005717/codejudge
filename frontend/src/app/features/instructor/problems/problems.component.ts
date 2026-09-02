@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -10,7 +14,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 
-interface Problem {
+import { ProblemService } from '../../../core/services/problem.service';
+
+interface InstructorProblem {
   id: number;
   title: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
@@ -18,6 +24,9 @@ interface Problem {
   published: boolean;
   createdAt: string;
 }
+
+type DifficultyFilter = 'all' | 'easy' | 'medium' | 'hard';
+type StatusFilter = 'all' | 'published' | 'draft';
 
 @Component({
   selector: 'app-instructor-problems',
@@ -36,67 +45,77 @@ interface Problem {
   templateUrl: './problems.component.html',
   styleUrl: './problems.component.scss'
 })
-export class ProblemsComponent {
-
+export class ProblemsComponent implements OnInit {
   searchTerm = '';
-  selectedDifficulty = 'all';
-  selectedStatus = 'all';
+  selectedDifficulty: DifficultyFilter = 'all';
+  selectedStatus: StatusFilter = 'all';
 
-  problems: Problem[] = [
-    {
-      id: 1,
-      title: 'Two Sum',
-      difficulty: 'Easy',
-      submissions: 86,
-      published: true,
-      createdAt: '28 Aug 2026'
-    },
-    {
-      id: 2,
-      title: 'Binary Search',
-      difficulty: 'Easy',
-      submissions: 64,
-      published: true,
-      createdAt: '27 Aug 2026'
-    },
-    {
-      id: 3,
-      title: 'Longest Substring Without Repeating Characters',
-      difficulty: 'Medium',
-      submissions: 52,
-      published: true,
-      createdAt: '25 Aug 2026'
-    },
-    {
-      id: 4,
-      title: 'Merge Intervals',
-      difficulty: 'Medium',
-      submissions: 41,
-      published: true,
-      createdAt: '23 Aug 2026'
-    },
-    {
-      id: 5,
-      title: 'Graph Shortest Path',
-      difficulty: 'Hard',
-      submissions: 27,
-      published: false,
-      createdAt: '21 Aug 2026'
-    },
-    {
-      id: 6,
-      title: 'Valid Parentheses',
-      difficulty: 'Easy',
-      submissions: 91,
-      published: true,
-      createdAt: '19 Aug 2026'
-    }
-  ];
+  problems: InstructorProblem[] = [];
+  filteredProblems: InstructorProblem[] = [];
 
-  get filteredProblems(): Problem[] {
+  isLoading = false;
+  errorMessage = '';
+
+  constructor(
+    private readonly problemService: ProblemService,
+    private readonly changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadProblems();
+  }
+
+  loadProblems(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.changeDetectorRef.detectChanges();
+
+    this.problemService.getProblems().subscribe({
+      next: (response) => {
+        console.log('Problems API response:', response);
+
+        const apiProblems = Array.isArray(response?.problems)
+          ? response.problems
+          : [];
+
+        this.problems = apiProblems.map((problem) => ({
+          id: problem.id,
+          title: problem.title,
+          difficulty: this.formatDifficulty(problem.difficulty),
+          submissions: 0,
+          published: problem.is_published,
+          createdAt: '—'
+        }));
+
+        this.applyFilters();
+
+        this.isLoading = false;
+
+        this.changeDetectorRef.detectChanges();
+      },
+
+      error: (error) => {
+        console.error('Failed to load problems:', error);
+
+        this.problems = [];
+        this.filteredProblems = [];
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to load problems. Please try again.';
+
+        this.isLoading = false;
+
+        this.changeDetectorRef.detectChanges();
+      }
+    });
+  }
+
+  applyFilters(): void {
     const search = this.searchTerm.trim().toLowerCase();
 
-    return this.problems.filter(problem => {
+    this.filteredProblems = this.problems.filter((problem) => {
       const matchesSearch =
         !search ||
         problem.title.toLowerCase().includes(search);
@@ -107,26 +126,83 @@ export class ProblemsComponent {
 
       const matchesStatus =
         this.selectedStatus === 'all' ||
-        (this.selectedStatus === 'published' && problem.published) ||
-        (this.selectedStatus === 'draft' && !problem.published);
+        (
+          this.selectedStatus === 'published' &&
+          problem.published
+        ) ||
+        (
+          this.selectedStatus === 'draft' &&
+          !problem.published
+        );
 
-      return matchesSearch &&
+      return (
+        matchesSearch &&
         matchesDifficulty &&
-        matchesStatus;
+        matchesStatus
+      );
     });
   }
 
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  onDifficultyChange(): void {
+    this.applyFilters();
+  }
+
+  onStatusChange(): void {
+    this.applyFilters();
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedDifficulty = 'all';
+    this.selectedStatus = 'all';
+
+    this.applyFilters();
+  }
+
   getDifficultyClass(
-    difficulty: Problem['difficulty']
+    difficulty: InstructorProblem['difficulty']
   ): string {
     return difficulty.toLowerCase();
   }
 
-  togglePublished(problem: Problem): void {
-    problem.published = !problem.published;
+  togglePublished(problem: InstructorProblem): void {
+    const nextPublished = !problem.published;
+
+    this.problemService.updateProblem(problem.id, {
+      is_published: nextPublished
+    }).subscribe({
+      next: () => {
+        problem.published = nextPublished;
+        this.applyFilters();
+
+        this.changeDetectorRef.detectChanges();
+      },
+
+      error: (error) => {
+        console.error(
+          'Failed to update problem status:',
+          error
+        );
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to update the problem status. Please try again.';
+
+        this.changeDetectorRef.detectChanges();
+      }
+    });
   }
 
-  deleteProblem(problem: Problem): void {
+  deleteProblem(problem: InstructorProblem): void {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${problem.title}"?`
     );
@@ -135,14 +211,45 @@ export class ProblemsComponent {
       return;
     }
 
-    this.problems = this.problems.filter(
-      item => item.id !== problem.id
-    );
+    this.problemService.deleteProblem(problem.id).subscribe({
+      next: () => {
+        this.problems = this.problems.filter(
+          (item) => item.id !== problem.id
+        );
+
+        this.applyFilters();
+
+        this.changeDetectorRef.detectChanges();
+      },
+
+      error: (error) => {
+        console.error(
+          'Failed to delete problem:',
+          error
+        );
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to delete the problem. Please try again.';
+
+        this.changeDetectorRef.detectChanges();
+      }
+    });
   }
 
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedDifficulty = 'all';
-    this.selectedStatus = 'all';
+  private formatDifficulty(
+    difficulty: string
+  ): InstructorProblem['difficulty'] {
+    switch (difficulty.toLowerCase()) {
+      case 'medium':
+        return 'Medium';
+
+      case 'hard':
+        return 'Hard';
+
+      case 'easy':
+      default:
+        return 'Easy';
+    }
   }
 }

@@ -5,14 +5,15 @@
     <button
       type="button"
       class="back-button"
-      (click)="goBack()">
+      (click)="goBack()"
+    >
       ← Back to Problems
     </button>
 
     <div
       *ngIf="problem"
-      class="problem-heading">
-
+      class="problem-heading"
+    >
       <div>
         <h1>{{ problem.title }}</h1>
 
@@ -20,24 +21,30 @@
           class="difficulty"
           [class.easy]="problem.difficulty === 'easy'"
           [class.medium]="problem.difficulty === 'medium'"
-          [class.hard]="problem.difficulty === 'hard'">
+          [class.hard]="problem.difficulty === 'hard'"
+        >
           {{ problem.difficulty | titlecase }}
         </span>
       </div>
-
     </div>
 
   </header>
 
+  <!-- Loading -->
   <div
     *ngIf="loading"
-    class="state-container">
+    class="state-container"
+  >
+    <div class="loading-spinner"></div>
     <p>Loading problem...</p>
   </div>
 
+  <!-- Error -->
   <div
     *ngIf="!loading && errorMessage"
-    class="state-container error-state">
+    class="state-container error-state"
+  >
+    <div class="state-icon">!</div>
 
     <h2>Unable to load problem</h2>
 
@@ -45,16 +52,19 @@
 
     <button
       type="button"
-      (click)="goBack()">
+      class="secondary-button"
+      (click)="goBack()"
+    >
       Back to Problems
     </button>
-
   </div>
 
   <main
     *ngIf="!loading && problem"
-    class="workspace">
+    class="workspace"
+  >
 
+    <!-- Problem -->
     <section class="problem-panel">
 
       <div class="section">
@@ -67,42 +77,40 @@
 
       <div
         *ngIf="problem.constraints"
-        class="section">
-
+        class="section"
+      >
         <h2>Constraints</h2>
 
         <p class="formatted-text">
           {{ problem.constraints }}
         </p>
-
       </div>
 
       <div
         *ngIf="problem.input_format"
-        class="section">
-
+        class="section"
+      >
         <h2>Input Format</h2>
 
         <p class="formatted-text">
           {{ problem.input_format }}
         </p>
-
       </div>
 
       <div
         *ngIf="problem.output_format"
-        class="section">
-
+        class="section"
+      >
         <h2>Output Format</h2>
 
         <p class="formatted-text">
           {{ problem.output_format }}
         </p>
-
       </div>
 
     </section>
 
+    <!-- Coding Area -->
     <section class="coding-panel">
 
       <div class="editor-header">
@@ -118,22 +126,28 @@
             type="button"
             class="run-button"
             [disabled]="isRunning || isSubmitting"
-            (click)="runCode()">
+            (click)="runCode()"
+          >
+            <span
+              *ngIf="isRunning"
+              class="button-spinner"
+            ></span>
 
-            Run
-
+            {{ isRunning ? 'Running...' : 'Run' }}
           </button>
 
           <button
             type="button"
             class="submit-button"
             [disabled]="isRunning || isSubmitting"
-            (click)="submitCode()">
+            (click)="submitCode()"
+          >
+            <span
+              *ngIf="isSubmitting"
+              class="button-spinner"
+            ></span>
 
-            {{ isSubmitting
-              ? 'Submitting...'
-              : 'Submit' }}
-
+            {{ isSubmitting ? 'Submitting...' : 'Submit' }}
           </button>
 
         </div>
@@ -142,18 +156,33 @@
 
       <div
         id="monaco-editor"
-        class="monaco-editor">
-      </div>
+        class="monaco-editor"
+      ></div>
 
+      <!-- Result -->
       <div
         *ngIf="result"
-        class="result-panel">
+        class="result-panel"
+        [class.result-accepted]="result.status === 'Accepted'"
+        [class.result-error-state]="
+          result.status !== 'Accepted'
+        "
+      >
 
         <div class="result-header">
 
-          <h2>Result</h2>
+          <div>
+            <h2>Result</h2>
+            <span class="result-subtitle">
+              Execution result
+            </span>
+          </div>
 
-          <span class="result-status">
+          <span
+            class="result-status"
+            [class.accepted]="result.status === 'Accepted'"
+            [class.failed]="result.status !== 'Accepted'"
+          >
             {{ result.status }}
           </span>
 
@@ -182,6 +211,11 @@
                   ? '—'
                   : result.passedTests
               }}
+              <ng-container
+                *ngIf="result.totalTests !== null"
+              >
+                / {{ result.totalTests }}
+              </ng-container>
             </strong>
           </div>
 
@@ -192,7 +226,7 @@
               {{
                 result.runtime === null
                   ? '—'
-                  : result.runtime + ' ms'
+                  : (result.runtime | number:'1.0-2') + ' ms'
               }}
             </strong>
           </div>
@@ -213,14 +247,13 @@
 
         <div
           *ngIf="result.errorMessage"
-          class="result-error">
-
+          class="result-error"
+        >
           <strong>Error</strong>
 
           <p>
             {{ result.errorMessage }}
           </p>
-
         </div>
 
       </div>

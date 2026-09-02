@@ -1,9 +1,15 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../../core/services/auth.service';
+import { MatIconModule } from '@angular/material/icon';
+import {
+  RouterModule
+} from '@angular/router';
+
+import {
+  AuthService,
+  User
+} from '../../../core/services/auth.service';
 
 interface NavigationItem {
   label: string;
@@ -16,93 +22,46 @@ interface NavigationItem {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    MatIconModule,
-    MatButtonModule
+    RouterModule,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss'
 })
-export class AppShellComponent {
+export class AppShellComponent implements OnInit {
+  user: User | null = null;
+
   sidebarOpen = false;
 
-  readonly studentNavigation: NavigationItem[] = [
-    {
-      label: 'Dashboard',
-      icon: 'dashboard',
-      route: '/student/dashboard'
-    },
-    {
-      label: 'Problems',
-      icon: 'code',
-      route: '/student/problems'
-    },
-    {
-      label: 'Submissions',
-      icon: 'assignment',
-      route: '/student/submissions'
-    },
-    {
-      label: 'Leaderboard',
-      icon: 'leaderboard',
-      route: '/student/leaderboard'
-    }
-  ];
-
-  readonly instructorNavigation: NavigationItem[] = [
-    {
-      label: 'Dashboard',
-      icon: 'dashboard',
-      route: '/instructor/dashboard'
-    },
-    {
-      label: 'Problems',
-      icon: 'code',
-      route: '/instructor/problems'
-    },
-    {
-      label: 'Submissions',
-      icon: 'assignment',
-      route: '/instructor/submissions'
-    },
-    {
-      label: 'Statistics',
-      icon: 'bar_chart',
-      route: '/instructor/analytics'
-    }
-  ];
+  navigationItems: NavigationItem[] = [];
 
   constructor(
-    private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly authService: AuthService
   ) {}
 
-  get user() {
-    return this.authService.getUser();
-  }
+  ngOnInit(): void {
+    this.user = this.authService.getUser();
 
-  get navigationItems(): NavigationItem[] {
-    if (this.user?.role === 'instructor') {
-      return this.instructorNavigation;
-    }
-
-    return this.studentNavigation;
-  }
-
-  get roleLabel(): string {
-    return this.user?.role === 'instructor' ? 'Instructor' : 'Student';
+    this.setNavigationItems();
   }
 
   get userInitial(): string {
-    const name = this.user?.name?.trim();
-
-    if (!name) {
-      return 'U';
+    if (!this.user?.name) {
+      return '?';
     }
 
-    return name.charAt(0).toUpperCase();
+    return this.user.name
+      .charAt(0)
+      .toUpperCase();
+  }
+
+  get roleLabel(): string {
+    if (this.user?.role === 'instructor') {
+      return 'Instructor';
+    }
+
+    return 'Student';
   }
 
   toggleSidebar(): void {
@@ -115,5 +74,62 @@ export class AppShellComponent {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  private setNavigationItems(): void {
+    if (this.user?.role === 'instructor') {
+      this.navigationItems = [
+        {
+          label: 'Dashboard',
+          icon: 'dashboard',
+          route: '/instructor/dashboard'
+        },
+        {
+          label: 'Problems',
+          icon: 'code',
+          route: '/instructor/problems'
+        },
+        {
+          label: 'Test Cases',
+          icon: 'fact_check',
+          route: '/instructor/testcases'
+        },
+        {
+          label: 'Submissions',
+          icon: 'assignment',
+          route: '/instructor/submissions'
+        },
+        {
+          label: 'Analytics',
+          icon: 'analytics',
+          route: '/instructor/analytics'
+        }
+      ];
+
+      return;
+    }
+
+    this.navigationItems = [
+      {
+        label: 'Dashboard',
+        icon: 'dashboard',
+        route: '/student/dashboard'
+      },
+      {
+        label: 'Problems',
+        icon: 'code',
+        route: '/student/problems'
+      },
+      {
+        label: 'Submissions',
+        icon: 'assignment',
+        route: '/student/submissions'
+      },
+      {
+        label: 'Leaderboard',
+        icon: 'leaderboard',
+        route: '/student/leaderboard'
+      }
+    ];
   }
 }
