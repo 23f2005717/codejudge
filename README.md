@@ -2,24 +2,21 @@
 
 CodeJudge is a Python coding-judge platform with separate Student and Instructor flows.
 
-## Project rule
+## Project Rule
+
 The implementation follows the supplied Final Build Document and wireframe strictly. Do not add screens, roles, or flows outside the documented scope without an explicit requirement.
 
 ## Stack
+
 - Frontend: Angular, TypeScript, Angular Material, Monaco Editor
 - Backend: Python, Flask, Flask-SQLAlchemy, Flask-JWT-Extended, Flask-CORS
 - Database: PostgreSQL
-- Code execution: Docker + Python
+- Code Execution: Docker + Python
 - Testing: Pytest
 
-## Current setup
-The repository scaffold is created. Backend and frontend feature implementation will follow the documented implementation order.
+## Local Setup Guide
 
-
-
-# Local Setup Guide
-
-## Requirements
+### Requirements
 
 Install the following before running the project:
 
@@ -27,7 +24,7 @@ Install the following before running the project:
 - Node.js + npm
 - PostgreSQL
 
-## 1. Clone or Download the Project
+### 1. Clone or Download the Project
 
 Clone the repository:
 
@@ -36,7 +33,7 @@ Clone the repository:
 
 Or download the ZIP file and extract it.
 
-## 2. Setup PostgreSQL
+### 2. Setup PostgreSQL
 
 Make sure PostgreSQL is installed and running.
 
@@ -44,9 +41,9 @@ Create a database named:
 
     codejudge
 
-## 3. Setup Backend
+### 3. Setup Backend
 
-Open a terminal in the project root and run:
+Open a terminal in the project root:
 
     cd backend
     python -m venv venv
@@ -61,11 +58,11 @@ Linux/macOS:
 
     source venv/bin/activate
 
-Install the required Python packages:
+Install the required packages:
 
     pip install -r requirements.txt
 
-Create the following file:
+Create:
 
     backend/.env
 
@@ -82,55 +79,46 @@ Start the backend:
 
     python run.py
 
-The backend will run at:
+Backend:
 
     http://127.0.0.1:5000
 
-## 4. Setup Frontend
+### 4. Setup Frontend
 
-Open a new terminal and go to the frontend directory:
+Open a new terminal:
 
     cd frontend
-
-Install the frontend dependencies:
-
     npm install
-
-Start the Angular application:
-
     npm start
 
-The frontend will run at:
+Frontend:
 
     http://localhost:4200
 
-## 5. Run the Application
+### 5. Run the Application
 
-Keep PostgreSQL running.
+Make sure PostgreSQL is running.
 
-Keep the backend running in one terminal:
+Backend terminal:
 
     cd backend
     .\venv\Scripts\Activate.ps1
     python run.py
 
-Keep the frontend running in another terminal:
+Frontend terminal:
 
     cd frontend
     npm start
 
-Open the application in your browser:
+Open the application:
 
     http://localhost:4200
 
-## 6. Important Notes
+### Important Notes
 
 - PostgreSQL must be running before starting the backend.
 - The database name must be `codejudge`.
 - Create `backend/.env` using your local PostgreSQL password.
 - Do not commit `backend/.env` to GitHub.
-- `backend/.env.example` can be used as a reference.
+- Use `backend/.env.example` as a reference.
 - The backend automatically creates the required database tables when it starts.
-  
-
-
