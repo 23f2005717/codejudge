@@ -84,7 +84,7 @@
 
   <mat-card class="content-card">
 
-    <div class="problem-selector">
+    <!-- <div class="problem-selector">
 
       <mat-form-field
         appearance="outline"
@@ -113,8 +113,31 @@
         </mat-select>
       </mat-form-field>
 
-    </div>
+    </div> -->
+        <div class="problem-selector">
 
+            <mat-form-field
+              appearance="outline"
+              class="problem-field"
+            >
+              <mat-label>Problem</mat-label>
+
+              <select
+                matNativeControl
+                [(ngModel)]="selectedProblemId"
+                (change)="onProblemChange()"
+                [disabled]="isLoadingProblems"
+              >
+                @for (problem of problems; track problem.id) {
+                  <option [ngValue]="problem.id">
+                    {{ problem.title }}
+                  </option>
+                }
+              </select>
+
+            </mat-form-field>
+
+          </div>
 
     @if (showAddForm) {
 

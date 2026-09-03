@@ -1,8 +1,13 @@
 import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
+
 import { MatButtonModule } from '@angular/material/button';
+
 import { MatIconModule } from '@angular/material/icon';
+
 import {
+  Router,
   RouterModule
 } from '@angular/router';
 
@@ -37,7 +42,8 @@ export class AppShellComponent implements OnInit {
   navigationItems: NavigationItem[] = [];
 
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -74,6 +80,8 @@ export class AppShellComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+
+    this.router.navigate(['/login']);
   }
 
   private setNavigationItems(): void {

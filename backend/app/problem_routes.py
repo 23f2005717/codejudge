@@ -1,19 +1,18 @@
 from flask import jsonify, request
+
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 
 from .extensions import db
+
 from .models.problem import Problem
 
 
 def register_problem_routes(app):
-
     @app.post("/api/problems")
     @jwt_required()
     def create_problem():
         """Create a new coding problem."""
-
         claims = get_jwt()
-
         # Only instructors can create problems.
         if claims.get("role") != "instructor":
             return jsonify({
@@ -61,14 +60,18 @@ def register_problem_routes(app):
                 "output_format": problem.output_format,
                 "constraints": problem.constraints,
                 "is_published": problem.is_published,
-                "instructor_id": problem.instructor_id
+                "instructor_id": problem.instructor_id,
+                "created_at": (
+                    problem.created_at.isoformat()
+                    if problem.created_at
+                    else None
+                )
             }
         }), 201
 
     @app.get("/api/problems")
     def get_problems():
         """Return the list of available problems."""
-
         problems = Problem.query.order_by(
             Problem.created_at.desc()
         ).all()
@@ -84,7 +87,12 @@ def register_problem_routes(app):
                 "input_format": problem.input_format,
                 "output_format": problem.output_format,
                 "constraints": problem.constraints,
-                "is_published": problem.is_published
+                "is_published": problem.is_published,
+                "created_at": (
+                    problem.created_at.isoformat()
+                    if problem.created_at
+                    else None
+                )
             })
 
         return jsonify({
@@ -95,7 +103,6 @@ def register_problem_routes(app):
     @app.get("/api/problems/<int:problem_id>")
     def get_problem(problem_id):
         """Return one problem."""
-
         problem = db.session.get(Problem, problem_id)
 
         if problem is None:
@@ -113,7 +120,12 @@ def register_problem_routes(app):
                 "output_format": problem.output_format,
                 "constraints": problem.constraints,
                 "is_published": problem.is_published,
-                "instructor_id": problem.instructor_id
+                "instructor_id": problem.instructor_id,
+                "created_at": (
+                    problem.created_at.isoformat()
+                    if problem.created_at
+                    else None
+                )
             }
         }), 200
 
@@ -121,7 +133,6 @@ def register_problem_routes(app):
     @jwt_required()
     def update_problem(problem_id):
         """Update a problem owned by the instructor."""
-
         claims = get_jwt()
 
         if claims.get("role") != "instructor":
@@ -183,7 +194,12 @@ def register_problem_routes(app):
                 "input_format": problem.input_format,
                 "output_format": problem.output_format,
                 "constraints": problem.constraints,
-                "is_published": problem.is_published
+                "is_published": problem.is_published,
+                "created_at": (
+                    problem.created_at.isoformat()
+                    if problem.created_at
+                    else None
+                )
             }
         }), 200
 
@@ -191,7 +207,6 @@ def register_problem_routes(app):
     @jwt_required()
     def delete_problem(problem_id):
         """Delete a problem owned by the instructor."""
-
         claims = get_jwt()
 
         if claims.get("role") != "instructor":

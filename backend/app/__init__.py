@@ -1,32 +1,47 @@
+from datetime import timedelta
+
 from flask import Flask, jsonify, request
 
 from flask_jwt_extended import create_access_token
 
 from .config import Config
+
 from .extensions import cors, db, jwt
 
 from .models.user import User
+
 from .models.problem import Problem
+
 from .models.testcase import TestCase
+
 from .models.submission import Submission
 
 from .utils.auth import hash_password, check_password
 
 from .problem_routes import register_problem_routes
+
 from .testcase_routes import register_testcase_routes
+
 from .submission_routes import register_submission_routes
+
 from .routes.analytics import register_analytics_routes
+
 from .routes.leaderboard import register_leaderboard_routes
 
 
 def create_app(config_class=Config):
+
     app = Flask(__name__)
 
     # Load application settings.
     app.config.from_object(config_class)
 
+    # JWT access token lifetime.
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
+
     # Connect Flask extensions.
     db.init_app(app)
+
     jwt.init_app(app)
 
     cors.init_app(
@@ -44,6 +59,7 @@ def create_app(config_class=Config):
 
     @app.get("/api/health")
     def health():
+
         return jsonify({
             "status": "ok",
             "service": "codejudge-backend"
@@ -51,6 +67,7 @@ def create_app(config_class=Config):
 
     @app.post("/api/auth/register")
     def register():
+
         data = request.get_json() or {}
 
         name = data.get("name")
@@ -60,11 +77,13 @@ def create_app(config_class=Config):
 
         # Basic validation.
         if not name or not email or not password:
+
             return jsonify({
                 "message": "Name, email and password are required."
             }), 400
 
         if role not in ["student", "instructor"]:
+
             return jsonify({
                 "message": "Role must be student or instructor."
             }), 400
@@ -75,6 +94,7 @@ def create_app(config_class=Config):
         ).first()
 
         if existing_user:
+
             return jsonify({
                 "message": "Email is already registered."
             }), 409
@@ -88,20 +108,25 @@ def create_app(config_class=Config):
         )
 
         db.session.add(user)
+
         db.session.commit()
 
         return jsonify({
+
             "message": "Registration successful.",
+
             "user": {
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
                 "role": user.role
             }
+
         }), 201
 
     @app.post("/api/auth/login")
     def login():
+
         data = request.get_json() or {}
 
         email = data.get("email")
@@ -109,6 +134,7 @@ def create_app(config_class=Config):
 
         # Basic validation.
         if not email or not password:
+
             return jsonify({
                 "message": "Email and password are required."
             }), 400
@@ -123,6 +149,7 @@ def create_app(config_class=Config):
             password,
             user.password_hash
         ):
+
             return jsonify({
                 "message": "Invalid email or password."
             }), 401
@@ -137,21 +164,29 @@ def create_app(config_class=Config):
         )
 
         return jsonify({
+
             "message": "Login successful.",
+
             "access_token": token,
+
             "user": {
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
                 "role": user.role
             }
+
         }), 200
 
     # Register application routes.
     register_problem_routes(app)
+
     register_testcase_routes(app)
+
     register_submission_routes(app)
+
     register_analytics_routes(app)
+
     register_leaderboard_routes(app)
 
     return app

@@ -1,17 +1,23 @@
-<div class="page-container">
+<div class="submissions-page">
 
   <div class="page-header">
     <div>
       <span class="eyebrow">Instructor</span>
+
       <h1>Submissions</h1>
-      <p>Review student submissions across your problems.</p>
+
+      <p class="subtitle">
+        Review student submissions across your problems.
+      </p>
     </div>
   </div>
+
 
   <!-- Summary -->
   <div class="summary-grid">
 
     <mat-card class="summary-card">
+
       <div class="summary-icon">
         <mat-icon>assignment</mat-icon>
       </div>
@@ -20,9 +26,12 @@
         <span>Total Submissions</span>
         <strong>{{ totalCount }}</strong>
       </div>
+
     </mat-card>
 
+
     <mat-card class="summary-card">
+
       <div class="summary-icon">
         <mat-icon>check_circle</mat-icon>
       </div>
@@ -31,9 +40,12 @@
         <span>Accepted</span>
         <strong>{{ acceptedCount }}</strong>
       </div>
+
     </mat-card>
 
+
     <mat-card class="summary-card">
+
       <div class="summary-icon">
         <mat-icon>cancel</mat-icon>
       </div>
@@ -42,9 +54,12 @@
         <span>Failed</span>
         <strong>{{ failedCount }}</strong>
       </div>
+
     </mat-card>
 
+
     <mat-card class="summary-card">
+
       <div class="summary-icon">
         <mat-icon>percent</mat-icon>
       </div>
@@ -53,16 +68,22 @@
         <span>Acceptance Rate</span>
         <strong>{{ acceptanceRate }}%</strong>
       </div>
+
     </mat-card>
 
   </div>
+
 
   <mat-card class="content-card">
 
     <!-- Filters -->
     <div class="filters">
 
-      <mat-form-field appearance="outline">
+      <!-- Search -->
+      <mat-form-field
+        appearance="outline"
+        class="search-field"
+      >
         <mat-label>Search submissions</mat-label>
 
         <input
@@ -71,33 +92,55 @@
           placeholder="Student, email, or problem"
         />
 
-        <mat-icon matSuffix>search</mat-icon>
+        <mat-icon matSuffix>
+          search
+        </mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+
+      <!-- Status -->
+      <mat-form-field
+        appearance="outline"
+        class="filter-field"
+      >
         <mat-label>Status</mat-label>
 
-        <mat-select [(ngModel)]="selectedStatus">
+        <select
+          matNativeControl
+          [(ngModel)]="selectedStatus"
+        >
           @for (status of statuses; track status) {
-            <mat-option [value]="status">
+            <option [ngValue]="status">
               {{ status }}
-            </mat-option>
+            </option>
           }
-        </mat-select>
+        </select>
+
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+
+      <!-- Language -->
+      <mat-form-field
+        appearance="outline"
+        class="filter-field"
+      >
         <mat-label>Language</mat-label>
 
-        <mat-select [(ngModel)]="selectedLanguage">
+        <select
+          matNativeControl
+          [(ngModel)]="selectedLanguage"
+        >
           @for (language of languages; track language) {
-            <mat-option [value]="language">
+            <option [ngValue]="language">
               {{ language }}
-            </mat-option>
+            </option>
           }
-        </mat-select>
+        </select>
+
       </mat-form-field>
 
+
+      <!-- Clear -->
       <button
         mat-stroked-button
         type="button"
@@ -110,9 +153,12 @@
 
     </div>
 
+
     <!-- Result count -->
     @if (!isLoading && !errorMessage) {
+
       <div class="result-bar">
+
         <span>
           Showing
           <strong>{{ filteredSubmissions.length }}</strong>
@@ -120,27 +166,42 @@
           <strong>{{ totalCount }}</strong>
           submissions
         </span>
+
       </div>
+
     }
+
 
     <!-- Loading -->
     @if (isLoading) {
+
       <div class="state-container">
+
         <mat-spinner diameter="42"></mat-spinner>
 
         <p>Loading submissions...</p>
+
       </div>
+
     }
+
 
     <!-- Error -->
     @if (!isLoading && errorMessage) {
+
       <div class="state-container error-state">
 
-        <mat-icon>error_outline</mat-icon>
+        <mat-icon>
+          error_outline
+        </mat-icon>
 
-        <h3>Unable to load submissions</h3>
+        <h3>
+          Unable to load submissions
+        </h3>
 
-        <p>{{ errorMessage }}</p>
+        <p>
+          {{ errorMessage }}
+        </p>
 
         <button
           mat-flat-button
@@ -152,7 +213,9 @@
         </button>
 
       </div>
+
     }
+
 
     <!-- Desktop table -->
     @if (
@@ -166,6 +229,7 @@
         <table class="submissions-table">
 
           <thead>
+
             <tr>
               <th>Student</th>
               <th>Problem</th>
@@ -175,7 +239,9 @@
               <th>Submitted</th>
               <th class="action-column"></th>
             </tr>
+
           </thead>
+
 
           <tbody>
 
@@ -186,49 +252,82 @@
 
               <tr>
 
+                <!-- Student -->
                 <td>
+
                   <div class="student-cell">
+
                     <div class="student-avatar">
                       {{ submission.student.charAt(0).toUpperCase() }}
                     </div>
 
-                    <div>
-                      <strong>{{ submission.student }}</strong>
-                      <span>{{ submission.email }}</span>
+                    <div class="student-information">
+
+                      <strong>
+                        {{ submission.student }}
+                      </strong>
+
+                      <span>
+                        {{ submission.email }}
+                      </span>
+
                     </div>
+
                   </div>
+
                 </td>
 
+
+                <!-- Problem -->
                 <td>
+
                   <span class="problem-name">
                     {{ submission.problem }}
                   </span>
+
                 </td>
 
+
+                <!-- Language -->
                 <td>
+
                   <span class="language-badge">
                     {{ submission.language }}
                   </span>
+
                 </td>
 
+
+                <!-- Status -->
                 <td>
+
                   <span
                     class="status-badge"
                     [ngClass]="getStatusClass(submission.status)"
                   >
+
                     <span class="status-dot"></span>
+
                     {{ submission.status }}
+
                   </span>
+
                 </td>
 
-                <td>
+
+                <!-- Execution -->
+                <td class="execution-time">
                   {{ submission.executionTime }}
                 </td>
 
-                <td>
+
+                <!-- Submitted -->
+                <td class="submitted-date">
                   {{ submission.submittedAt }}
                 </td>
 
+
+                <!-- Action -->
                 <td class="action-column">
 
                   <button
@@ -240,7 +339,9 @@
                       submission.id
                     ]"
                   >
-                    <mat-icon>chevron_right</mat-icon>
+                    <mat-icon>
+                      chevron_right
+                    </mat-icon>
                   </button>
 
                 </td>
@@ -255,8 +356,9 @@
 
       </div>
 
+
       <!-- Mobile cards -->
-      <div class="mobile-submissions">
+      <div class="mobile-list">
 
         @for (
           submission of filteredSubmissions;
@@ -265,7 +367,7 @@
 
           <mat-card class="submission-card">
 
-            <div class="submission-card-header">
+            <div class="mobile-card-header">
 
               <div class="student-cell">
 
@@ -273,12 +375,20 @@
                   {{ submission.student.charAt(0).toUpperCase() }}
                 </div>
 
-                <div>
-                  <strong>{{ submission.student }}</strong>
-                  <span>{{ submission.email }}</span>
+                <div class="student-information">
+
+                  <strong>
+                    {{ submission.student }}
+                  </strong>
+
+                  <span>
+                    {{ submission.email }}
+                  </span>
+
                 </div>
 
               </div>
+
 
               <span
                 class="status-badge"
@@ -290,31 +400,56 @@
 
             </div>
 
-            <div class="submission-card-body">
+
+            <div class="mobile-details">
 
               <div class="detail-item">
+
                 <span>Problem</span>
-                <strong>{{ submission.problem }}</strong>
+
+                <strong>
+                  {{ submission.problem }}
+                </strong>
+
               </div>
 
+
               <div class="detail-item">
+
                 <span>Language</span>
-                <strong>{{ submission.language }}</strong>
+
+                <strong>
+                  {{ submission.language }}
+                </strong>
+
               </div>
 
+
               <div class="detail-item">
+
                 <span>Execution</span>
-                <strong>{{ submission.executionTime }}</strong>
+
+                <strong>
+                  {{ submission.executionTime }}
+                </strong>
+
               </div>
 
+
               <div class="detail-item">
+
                 <span>Submitted</span>
-                <strong>{{ submission.submittedAt }}</strong>
+
+                <strong>
+                  {{ submission.submittedAt }}
+                </strong>
+
               </div>
 
             </div>
 
-            <div class="submission-card-footer">
+
+            <div class="mobile-footer">
 
               <button
                 mat-stroked-button
@@ -325,7 +460,11 @@
                 ]"
               >
                 View Submission
-                <mat-icon>arrow_forward</mat-icon>
+
+                <mat-icon>
+                  arrow_forward
+                </mat-icon>
+
               </button>
 
             </div>
@@ -335,7 +474,9 @@
         }
 
       </div>
+
     }
+
 
     <!-- Empty state -->
     @if (
@@ -346,11 +487,15 @@
 
       <div class="state-container empty-state">
 
-        <mat-icon>inbox</mat-icon>
+        <mat-icon>
+          inbox
+        </mat-icon>
 
         @if (totalCount === 0) {
 
-          <h3>No submissions yet</h3>
+          <h3>
+            No submissions yet
+          </h3>
 
           <p>
             Student submissions will appear here once
@@ -359,7 +504,9 @@
 
         } @else {
 
-          <h3>No matching submissions</h3>
+          <h3>
+            No matching submissions
+          </h3>
 
           <p>
             Try changing your search or filter criteria.

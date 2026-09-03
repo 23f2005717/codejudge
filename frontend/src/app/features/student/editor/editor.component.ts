@@ -1,18 +1,16 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnDestroy,
-  OnInit
+  OnInit,
+  ViewChild
 } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import loader from '@monaco-editor/loader';
-import * as monaco from 'monaco-editor';
-
 import { Subscription } from 'rxjs';
 
 import {
@@ -21,7 +19,6 @@ import {
 } from '../../../core/services/problem.service';
 
 import {
-  RunCodeResponse,
   SubmissionService
 } from '../../../core/services/submission.service';
 
@@ -46,11 +43,15 @@ interface ExecutionResult {
   styleUrl: './editor.component.scss'
 })
 export class EditorComponent
-  implements OnInit, AfterViewInit, OnDestroy {
+  implements OnInit, OnDestroy {
+
+  @ViewChild('monacoEditor')
+  private monacoEditorContainer?: ElementRef<HTMLDivElement>;
 
   problem: Problem | null = null;
 
   loading = true;
+
   errorMessage = '';
 
   code = `# Write your Python solution here
@@ -58,17 +59,19 @@ export class EditorComponent
 `;
 
   isRunning = false;
+
   isSubmitting = false;
 
   result: ExecutionResult | null = null;
 
   private problemId: number | null = null;
 
+  private editor: any = null;
+
+  private editorInitialized = false;
+
   private readonly subscriptions =
     new Subscription();
-
-  private editor:
-    monaco.editor.IStandaloneCodeEditor | null = null;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -86,60 +89,13 @@ export class EditorComponent
     if (!Number.isInteger(id) || id <= 0) {
       this.loading = false;
       this.errorMessage = 'Invalid problem ID.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.problemId = id;
+
     this.loadProblem(id);
-  }
-
-  async ngAfterViewInit(): Promise<void> {
-    try {
-      await loader.init();
-
-      const editorElement =
-        document.getElementById('monaco-editor');
-
-      if (!editorElement) {
-        return;
-      }
-
-      this.editor = monaco.editor.create(
-        editorElement,
-        {
-          value: this.code,
-          language: 'python',
-          theme: 'vs',
-          automaticLayout: true,
-
-          minimap: {
-            enabled: false
-          },
-
-          fontSize: 14,
-          lineNumbers: 'on',
-          scrollBeyondLastLine: false,
-          wordWrap: 'on',
-          tabSize: 4
-        }
-      );
-
-      this.editor.onDidChangeModelContent(() => {
-        this.code =
-          this.editor?.getValue() ?? '';
-      });
-
-    } catch (error) {
-      console.error(
-        'Monaco editor initialization error:',
-        error
-      );
-
-      this.errorMessage =
-        'Unable to load the code editor.';
-
-      this.cdr.detectChanges();
-    }
   }
 
   ngOnDestroy(): void {
@@ -152,22 +108,37 @@ export class EditorComponent
       this.result = {
         status: 'Invalid',
         score: null,
-        totalTests: null,
-        passedTests: null,
+        totalTests: 0,
+        passedTests: 0,
         runtime: null,
         memory: null,
         errorMessage: 'Code is required.'
       };
 
+      this.cdr.detectChanges();
+
       return;
     }
 
     if (this.problemId === null) {
+      this.result = {
+        status: 'Invalid',
+        score: null,
+        totalTests: null,
+        passedTests: null,
+        runtime: null,
+        memory: null,
+        errorMessage: 'Problem ID is not available.'
+      };
+
+      this.cdr.detectChanges();
+
       return;
     }
 
     this.isRunning = true;
     this.result = null;
+    this.errorMessage = '';
 
     const request =
       this.submissionService.runCode(
@@ -177,25 +148,21 @@ export class EditorComponent
           language: 'python'
         }
       ).subscribe({
-
-        next: (response: RunCodeResponse) => {
-          const execution =
-            response.result;
+        next: (response) => {
+          const runResult = response.result;
 
           this.result = {
-            status: execution.status,
+            status: runResult.status,
             score: null,
-            totalTests:
-              execution.total_tests,
-            passedTests:
-              execution.passed_tests,
+            totalTests: runResult.total_tests,
+            passedTests: runResult.passed_tests,
             runtime:
-              execution.execution_time !== null
-                ? execution.execution_time * 1000
+              runResult.execution_time !== null
+                ? runResult.execution_time * 1000
                 : null,
             memory: null,
             errorMessage:
-              execution.error_message
+              runResult.error_message
           };
 
           this.isRunning = false;
@@ -205,7 +172,7 @@ export class EditorComponent
 
         error: (error) => {
           console.error(
-            'Run code API error:',
+            'RUN CODE API ERROR:',
             error
           );
 
@@ -225,7 +192,6 @@ export class EditorComponent
 
           this.cdr.detectChanges();
         }
-
       });
 
     this.subscriptions.add(request);
@@ -243,6 +209,8 @@ export class EditorComponent
         errorMessage: 'Code is required.'
       };
 
+      this.cdr.detectChanges();
+
       return;
     }
 
@@ -251,6 +219,7 @@ export class EditorComponent
     }
 
     this.isSubmitting = true;
+
     this.result = null;
 
     const request =
@@ -261,7 +230,6 @@ export class EditorComponent
           language: 'python'
         }
       ).subscribe({
-
         next: (response) => {
           const submission =
             response.submission;
@@ -286,11 +254,6 @@ export class EditorComponent
         },
 
         error: (error) => {
-          console.error(
-            'Submit code API error:',
-            error
-          );
-
           this.isSubmitting = false;
 
           this.result = {
@@ -307,7 +270,6 @@ export class EditorComponent
 
           this.cdr.detectChanges();
         }
-
       });
 
     this.subscriptions.add(request);
@@ -325,23 +287,42 @@ export class EditorComponent
 
     const request =
       this.problemService.getProblem(id).subscribe({
-
         next: (response) => {
+          console.log(
+            'EDITOR PROBLEM RESPONSE:',
+            response
+          );
+
+          if (!response || !response.problem) {
+            this.loading = false;
+            this.errorMessage =
+              'Problem data was not returned.';
+
+            this.cdr.detectChanges();
+
+            return;
+          }
+
           this.problem = response.problem;
+
           this.loading = false;
 
           this.cdr.detectChanges();
+
+          setTimeout(() => {
+            void this.initializeEditor();
+          });
         },
 
         error: (error) => {
           console.error(
-            'Problem details API error:',
+            'EDITOR PROBLEM API ERROR:',
             error
           );
 
           this.loading = false;
 
-          if (error.status === 404) {
+          if (error?.status === 404) {
             this.errorMessage =
               'Problem not found.';
           } else {
@@ -352,9 +333,77 @@ export class EditorComponent
 
           this.cdr.detectChanges();
         }
-
       });
 
     this.subscriptions.add(request);
   }
+
+  private async initializeEditor(): Promise<void> {
+    if (this.editorInitialized) {
+      return;
+    }
+
+    const container =
+      this.monacoEditorContainer?.nativeElement;
+
+    if (!container) {
+      return;
+    }
+
+    this.editorInitialized = true;
+
+    try {
+      const monaco = await loader.init();
+
+      if (!this.monacoEditorContainer) {
+        this.editorInitialized = false;
+        return;
+      }
+
+      this.editor =
+        monaco.editor.create(
+          container,
+          {
+            value: this.code,
+            language: 'python',
+            theme: 'vs',
+            automaticLayout: true,
+            minimap: {
+              enabled: false
+            },
+            fontSize: 14,
+            lineNumbers: 'on',
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            tabSize: 4,
+            padding: {
+              top: 12,
+              bottom: 12
+            }
+          }
+        );
+
+      this.editor.onDidChangeModelContent(() => {
+        if (this.editor) {
+          this.code =
+            this.editor.getValue();
+        }
+      });
+    } catch (error) {
+      console.error(
+        'Monaco editor initialization failed:',
+        error
+      );
+
+      this.editorInitialized = false;
+
+      this.errorMessage =
+        'Unable to load the code editor.';
+
+      this.cdr.detectChanges();
+    }
+  }
 }
+
+
+

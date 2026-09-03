@@ -9,9 +9,7 @@ import { roleGuard } from './core/guards/role.guard';
 import { AppShellComponent } from './shared/components/app-shell/app-shell.component';
 
 export const routes: Routes = [
-  // =====================================================
-  // PUBLIC
-  // =====================================================
+
 
   {
     path: '',
@@ -29,9 +27,7 @@ export const routes: Routes = [
     component: RegisterComponent
   },
 
-  // =====================================================
-  // AUTHENTICATED APPLICATION
-  // =====================================================
+
 
   {
     path: '',
@@ -40,9 +36,7 @@ export const routes: Routes = [
 
     children: [
 
-      // =================================================
-      // STUDENT
-      // =================================================
+
 
       {
         path: 'student/dashboard',
@@ -124,9 +118,6 @@ export const routes: Routes = [
         }
       },
 
-      // =================================================
-      // INSTRUCTOR
-      // =================================================
 
       {
         path: 'instructor/dashboard',
@@ -144,9 +135,7 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // PROBLEM MANAGEMENT
-      // -------------------------------------------------
+
 
       {
         path: 'instructor/problems',
@@ -164,9 +153,7 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // CREATE PROBLEM
-      // -------------------------------------------------
+
 
       {
         path: 'instructor/problems/create',
@@ -184,9 +171,7 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // EDIT PROBLEM
-      // -------------------------------------------------
+ 
 
       {
         path: 'instructor/problems/:id/edit',
@@ -204,9 +189,7 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // TEST CASES
-      // -------------------------------------------------
+ 
 
       {
         path: 'instructor/testcases',
@@ -224,9 +207,6 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // SUBMISSIONS
-      // -------------------------------------------------
 
       {
         path: 'instructor/submissions',
@@ -244,9 +224,7 @@ export const routes: Routes = [
         }
       },
 
-      // -------------------------------------------------
-      // ANALYTICS
-      // -------------------------------------------------
+
 
       {
         path: 'instructor/analytics',
@@ -266,9 +244,7 @@ export const routes: Routes = [
     ]
   },
 
-  // =====================================================
-  // FALLBACK
-  // =====================================================
+ 
 
   {
     path: '**',
