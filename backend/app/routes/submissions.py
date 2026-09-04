@@ -236,6 +236,8 @@ def register_submission_routes(app):
                 "id": submission.id,
                 "status": submission.status,
                 "score": submission.score,
+                "passed_tests": passed,
+                "total_tests": total,
                 "execution_time": round(
                     submission.execution_time,
                     4
@@ -372,4 +374,57 @@ def register_submission_routes(app):
         return jsonify({
             "count": len(result),
             "submissions": result
+        }), 200
+
+    @app.get("/api/instructor/submissions/<int:submission_id>")
+    @jwt_required()
+    def get_instructor_submission(submission_id):
+        """Return one submission for an instructor-owned problem."""
+
+        claims = get_jwt()
+
+        if claims.get("role") != "instructor":
+            return jsonify({
+                "message": "Only instructors can view submissions."
+            }), 403
+
+        instructor_id = int(get_jwt_identity())
+
+        submission = (
+            Submission.query
+            .join(
+                Problem,
+                Submission.problem_id == Problem.id
+            )
+            .filter(
+                Submission.id == submission_id,
+                Problem.instructor_id == instructor_id
+            )
+            .first()
+        )
+
+        if submission is None:
+            return jsonify({
+                "message": "Submission not found."
+            }), 404
+
+        return jsonify({
+            "submission": {
+                "id": submission.id,
+                "student": submission.student.name,
+                "email": submission.student.email,
+                "problem": submission.problem.title,
+                "problem_id": submission.problem_id,
+                "code": submission.code,
+                "language": submission.language,
+                "status": submission.status,
+                "score": submission.score,
+                "execution_time": submission.execution_time,
+                "error_message": submission.error_message,
+                "created_at": (
+                    submission.created_at.isoformat()
+                    if submission.created_at
+                    else None
+                )
+            }
         }), 200

@@ -1,0 +1,123 @@
+<div class="submission-details-page">
+
+  <div class="page-header">
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()"
+    >
+      ← Back to Submissions
+    </button>
+
+    <h1>Submission Details</h1>
+
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="state-message"
+  >
+    Loading submission...
+  </div>
+
+  <div
+    *ngIf="!loading && errorMessage"
+    class="state-message error"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <div
+    *ngIf="!loading && submission"
+    class="details-card"
+  >
+
+    <div class="details-grid">
+
+      <div class="detail-item">
+        <span class="label">Student</span>
+        <span class="value">
+          {{ submission.student }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Email</span>
+        <span class="value">
+          {{ submission.email }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Problem</span>
+        <span class="value">
+          {{ submission.problem }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Language</span>
+        <span class="value">
+          {{ submission.language }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Status</span>
+        <span class="value">
+          {{ submission.status }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Score</span>
+        <span class="value">
+          {{ submission.score }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Execution Time</span>
+        <span class="value">
+          {{
+            submission.execution_time !== null
+              ? (submission.execution_time * 1000 | number:'1.0-0') + ' ms'
+              : 'N/A'
+          }}
+        </span>
+      </div>
+
+      <div class="detail-item">
+        <span class="label">Submitted At</span>
+        <span class="value">
+          {{
+            submission.created_at
+              ? (submission.created_at | date:'medium')
+              : 'N/A'
+          }}
+        </span>
+      </div>
+
+    </div>
+
+    <div
+      *ngIf="submission.error_message"
+      class="error-section"
+    >
+      <h2>Error</h2>
+
+      <pre>{{ submission.error_message }}</pre>
+    </div>
+
+    <div class="code-section">
+
+      <h2>Submitted Code</h2>
+
+      <pre class="code-block"><code>{{ submission.code }}</code></pre>
+
+    </div>
+
+  </div>
+
+</div>
