@@ -18,11 +18,17 @@ from .models.submission import Submission
 
 from .utils.auth import hash_password, check_password
 
-from .problem_routes import register_problem_routes
+# from .problem_routes import register_problem_routes
 
-from .testcase_routes import register_testcase_routes
+# from .testcase_routes import register_testcase_routes
 
-from .submission_routes import register_submission_routes
+# from .submission_routes import register_submission_routes
+
+from .routes.problems import register_problem_routes
+
+from .routes.testcases import register_testcase_routes
+
+from .routes.submissions import register_submission_routes
 
 from .routes.analytics import register_analytics_routes
 
@@ -33,13 +39,13 @@ def create_app(config_class=Config):
 
     app = Flask(__name__)
 
-    # Load application settings.
+   
     app.config.from_object(config_class)
 
-    # JWT access token lifetime.
+    
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
 
-    # Connect Flask extensions.
+    
     db.init_app(app)
 
     jwt.init_app(app)
@@ -53,7 +59,7 @@ def create_app(config_class=Config):
         }
     )
 
-    # Create database tables automatically.
+    
     with app.app_context():
         db.create_all()
 
@@ -75,7 +81,7 @@ def create_app(config_class=Config):
         password = data.get("password")
         role = data.get("role", "student")
 
-        # Basic validation.
+        
         if not name or not email or not password:
 
             return jsonify({
@@ -88,7 +94,7 @@ def create_app(config_class=Config):
                 "message": "Role must be student or instructor."
             }), 400
 
-        # Check whether the email already exists.
+      
         existing_user = User.query.filter_by(
             email=email
         ).first()
@@ -99,7 +105,7 @@ def create_app(config_class=Config):
                 "message": "Email is already registered."
             }), 409
 
-        # Create the user.
+        
         user = User(
             name=name,
             email=email,
@@ -132,7 +138,7 @@ def create_app(config_class=Config):
         email = data.get("email")
         password = data.get("password")
 
-        # Basic validation.
+        
         if not email or not password:
 
             return jsonify({
@@ -144,7 +150,7 @@ def create_app(config_class=Config):
             email=email
         ).first()
 
-        # Check the password.
+       
         if not user or not check_password(
             password,
             user.password_hash
@@ -178,7 +184,7 @@ def create_app(config_class=Config):
 
         }), 200
 
-    # Register application routes.
+    
     register_problem_routes(app)
 
     register_testcase_routes(app)

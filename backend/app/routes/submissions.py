@@ -1,11 +1,15 @@
-# submissions routes will be implemented in the documented API step.
 from flask import jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from .extensions import db
-from .models.problem import Problem
-from .models.submission import Submission
-from .utils.code_executor import run_python_code
+from flask_jwt_extended import (
+    get_jwt,
+    get_jwt_identity,
+    jwt_required
+)
+
+from ..extensions import db
+from ..models.problem import Problem
+from ..models.submission import Submission
+from ..utils.code_executor import run_python_code
 
 
 def register_submission_routes(app):
@@ -89,11 +93,10 @@ def register_submission_routes(app):
                 passed += 1
             else:
                 final_status = "Wrong Answer"
-                final_error = "Output does not match the expected result."
+                final_error = (
+                    "Output does not match the expected result."
+                )
                 break
-
-        if final_status == "Accepted" and passed != total:
-            final_status = "Wrong Answer"
 
         return jsonify({
             "message": "Code executed successfully.",
@@ -138,7 +141,10 @@ def register_submission_routes(app):
 
         if language.lower() != "python":
             return jsonify({
-                "message": "Currently only Python submissions are supported."
+                "message": (
+                    "Currently only Python submissions "
+                    "are supported."
+                )
             }), 400
 
         submission = Submission(
@@ -157,7 +163,6 @@ def register_submission_routes(app):
 
         if not test_cases:
             submission.status = "No Test Cases"
-
             db.session.commit()
 
             return jsonify({
@@ -175,7 +180,6 @@ def register_submission_routes(app):
         passed = 0
         total = len(test_cases)
         total_execution_time = 0
-
         final_status = "Accepted"
         final_error = None
 
@@ -207,6 +211,9 @@ def register_submission_routes(app):
                 passed += 1
             else:
                 final_status = "Wrong Answer"
+                final_error = (
+                    "Output does not match the expected result."
+                )
                 break
 
         score = int(
@@ -292,7 +299,9 @@ def register_submission_routes(app):
 
         if submission.student_id != student_id:
             return jsonify({
-                "message": "You can only view your own submissions."
+                "message": (
+                    "You can only view your own submissions."
+                )
             }), 403
 
         return jsonify({
@@ -310,4 +319,57 @@ def register_submission_routes(app):
                     else None
                 )
             }
+        }), 200
+
+    @app.get("/api/instructor/submissions")
+    @jwt_required()
+    def get_instructor_submissions():
+        """Return submissions for problems owned by the instructor."""
+
+        claims = get_jwt()
+
+        if claims.get("role") != "instructor":
+            return jsonify({
+                "message": "Only instructors can view submissions."
+            }), 403
+
+        instructor_id = int(get_jwt_identity())
+
+        submissions = (
+            Submission.query
+            .join(
+                Problem,
+                Submission.problem_id == Problem.id
+            )
+            .filter(
+                Problem.instructor_id == instructor_id
+            )
+            .order_by(
+                Submission.created_at.desc()
+            )
+            .all()
+        )
+
+        result = []
+
+        for submission in submissions:
+            result.append({
+                "id": submission.id,
+                "student": submission.student.name,
+                "email": submission.student.email,
+                "problem": submission.problem.title,
+                "language": submission.language,
+                "status": submission.status,
+                "score": submission.score,
+                "execution_time": submission.execution_time,
+                "created_at": (
+                    submission.created_at.isoformat()
+                    if submission.created_at
+                    else None
+                )
+            })
+
+        return jsonify({
+            "count": len(result),
+            "submissions": result
         }), 200
