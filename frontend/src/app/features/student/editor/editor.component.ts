@@ -8,9 +8,13 @@ import {
 } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
+
 import loader from '@monaco-editor/loader';
+
 import { Subscription } from 'rxjs';
 
 import {
@@ -28,7 +32,6 @@ interface ExecutionResult {
   totalTests: number | null;
   passedTests: number | null;
   runtime: number | null;
-  memory: number | null;
   errorMessage: string | null;
 }
 
@@ -42,6 +45,7 @@ interface ExecutionResult {
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
+
 export class EditorComponent
   implements OnInit, OnDestroy {
 
@@ -55,7 +59,6 @@ export class EditorComponent
   errorMessage = '';
 
   code = `# Write your Python solution here
-
 `;
 
   isRunning = false;
@@ -82,14 +85,19 @@ export class EditorComponent
   ) {}
 
   ngOnInit(): void {
+
     const id = Number(
       this.route.snapshot.paramMap.get('id')
     );
 
     if (!Number.isInteger(id) || id <= 0) {
+
       this.loading = false;
+
       this.errorMessage = 'Invalid problem ID.';
+
       this.cdr.detectChanges();
+
       return;
     }
 
@@ -99,19 +107,28 @@ export class EditorComponent
   }
 
   ngOnDestroy(): void {
+
     this.editor?.dispose();
+
     this.subscriptions.unsubscribe();
   }
 
   runCode(): void {
+
     if (!this.code.trim()) {
+
       this.result = {
+
         status: 'Invalid',
+
         score: null,
+
         totalTests: 0,
+
         passedTests: 0,
+
         runtime: null,
-        memory: null,
+
         errorMessage: 'Code is required.'
       };
 
@@ -121,13 +138,19 @@ export class EditorComponent
     }
 
     if (this.problemId === null) {
+
       this.result = {
+
         status: 'Invalid',
+
         score: null,
+
         totalTests: null,
+
         passedTests: null,
+
         runtime: null,
-        memory: null,
+
         errorMessage: 'Problem ID is not available.'
       };
 
@@ -137,7 +160,9 @@ export class EditorComponent
     }
 
     this.isRunning = true;
+
     this.result = null;
+
     this.errorMessage = '';
 
     const request =
@@ -148,19 +173,26 @@ export class EditorComponent
           language: 'python'
         }
       ).subscribe({
+
         next: (response) => {
+
           const runResult = response.result;
 
           this.result = {
+
             status: runResult.status,
+
             score: null,
+
             totalTests: runResult.total_tests,
+
             passedTests: runResult.passed_tests,
+
             runtime:
               runResult.execution_time !== null
                 ? runResult.execution_time * 1000
                 : null,
-            memory: null,
+
             errorMessage:
               runResult.error_message
           };
@@ -171,6 +203,7 @@ export class EditorComponent
         },
 
         error: (error) => {
+
           console.error(
             'RUN CODE API ERROR:',
             error
@@ -179,12 +212,17 @@ export class EditorComponent
           this.isRunning = false;
 
           this.result = {
+
             status: 'Run Failed',
+
             score: null,
+
             totalTests: null,
+
             passedTests: null,
+
             runtime: null,
-            memory: null,
+
             errorMessage:
               error?.error?.message ??
               'Unable to run the code.'
@@ -198,14 +236,21 @@ export class EditorComponent
   }
 
   submitCode(): void {
+
     if (!this.code.trim()) {
+
       this.result = {
+
         status: 'Invalid',
+
         score: null,
+
         totalTests: null,
+
         passedTests: null,
+
         runtime: null,
-        memory: null,
+
         errorMessage: 'Code is required.'
       };
 
@@ -215,6 +260,7 @@ export class EditorComponent
     }
 
     if (this.problemId === null) {
+
       return;
     }
 
@@ -230,20 +276,27 @@ export class EditorComponent
           language: 'python'
         }
       ).subscribe({
+
         next: (response) => {
+
           const submission =
             response.submission;
 
           this.result = {
+
             status: submission.status,
+
             score: submission.score,
-            totalTests: null,
-            passedTests: null,
+
+            totalTests: submission.total_tests,
+
+            passedTests: submission.passed_tests,
+
             runtime:
               submission.execution_time !== null
                 ? submission.execution_time * 1000
                 : null,
-            memory: null,
+
             errorMessage:
               submission.error_message
           };
@@ -254,15 +307,21 @@ export class EditorComponent
         },
 
         error: (error) => {
+
           this.isSubmitting = false;
 
           this.result = {
+
             status: 'Submission Failed',
+
             score: null,
+
             totalTests: null,
+
             passedTests: null,
+
             runtime: null,
-            memory: null,
+
             errorMessage:
               error?.error?.message ??
               'Unable to submit the code.'
@@ -276,25 +335,32 @@ export class EditorComponent
   }
 
   goBack(): void {
+
     this.router.navigate([
       '/student/problems'
     ]);
   }
 
   private loadProblem(id: number): void {
+
     this.loading = true;
+
     this.errorMessage = '';
 
     const request =
       this.problemService.getProblem(id).subscribe({
+
         next: (response) => {
+
           console.log(
             'EDITOR PROBLEM RESPONSE:',
             response
           );
 
           if (!response || !response.problem) {
+
             this.loading = false;
+
             this.errorMessage =
               'Problem data was not returned.';
 
@@ -310,11 +376,14 @@ export class EditorComponent
           this.cdr.detectChanges();
 
           setTimeout(() => {
+
             void this.initializeEditor();
+
           });
         },
 
         error: (error) => {
+
           console.error(
             'EDITOR PROBLEM API ERROR:',
             error
@@ -323,9 +392,12 @@ export class EditorComponent
           this.loading = false;
 
           if (error?.status === 404) {
+
             this.errorMessage =
               'Problem not found.';
+
           } else {
+
             this.errorMessage =
               error?.error?.message ??
               'Unable to load this problem.';
@@ -339,7 +411,9 @@ export class EditorComponent
   }
 
   private async initializeEditor(): Promise<void> {
+
     if (this.editorInitialized) {
+
       return;
     }
 
@@ -347,16 +421,20 @@ export class EditorComponent
       this.monacoEditorContainer?.nativeElement;
 
     if (!container) {
+
       return;
     }
 
     this.editorInitialized = true;
 
     try {
+
       const monaco = await loader.init();
 
       if (!this.monacoEditorContainer) {
+
         this.editorInitialized = false;
+
         return;
       }
 
@@ -364,32 +442,49 @@ export class EditorComponent
         monaco.editor.create(
           container,
           {
+
             value: this.code,
+
             language: 'python',
+
             theme: 'vs',
+
             automaticLayout: true,
+
             minimap: {
               enabled: false
             },
+
             fontSize: 14,
+
             lineNumbers: 'on',
+
             scrollBeyondLastLine: false,
+
             wordWrap: 'on',
+
             tabSize: 4,
+
             padding: {
+
               top: 12,
+
               bottom: 12
             }
           }
         );
 
       this.editor.onDidChangeModelContent(() => {
+
         if (this.editor) {
+
           this.code =
             this.editor.getValue();
         }
       });
+
     } catch (error) {
+
       console.error(
         'Monaco editor initialization failed:',
         error
@@ -404,6 +499,3 @@ export class EditorComponent
     }
   }
 }
-
-
-
