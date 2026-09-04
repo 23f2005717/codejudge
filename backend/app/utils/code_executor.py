@@ -1,13 +1,19 @@
+import os
 import subprocess
-import sys
 import tempfile
 import time
-import os
+
+
+DOCKER_IMAGE = "codejudge-python"
+
+MEMORY_LIMIT = "128m"
+CPU_LIMIT = "0.5"
+PROCESS_LIMIT = "64"
 
 
 def run_python_code(code, input_data, time_limit=3):
     """
-    Run a Python submission against one test case.
+    Run one Python submission inside an isolated Docker container.
 
     Returns:
         status
@@ -17,9 +23,9 @@ def run_python_code(code, input_data, time_limit=3):
     """
 
     file_path = None
+    container_name = None
 
     try:
-        # Create a temporary Python file.
         with tempfile.NamedTemporaryFile(
             mode="w",
             suffix=".py",
@@ -29,20 +35,82 @@ def run_python_code(code, input_data, time_limit=3):
             file.write(code)
             file_path = file.name
 
+        
+        container_name = f"codejudge-run-{os.getpid()}-{int(time.time() * 1000)}"
+
+        command = [
+            "docker",
+            "run",
+            "--name", container_name,
+            "--rm",
+            "-i",
+
+            
+            "--network", "none",
+
+            
+            "--memory", MEMORY_LIMIT,
+            "--cpus", CPU_LIMIT,
+            "--pids-limit", PROCESS_LIMIT,
+
+            
+            "--read-only",
+
+            "--tmpfs", "/tmp:rw,noexec,nosuid,size=16m",
+
+            "-e", "PYTHONDONTWRITEBYTECODE=1",
+
+            "-v", f"{file_path}:/code/submission.py:ro",
+
+            DOCKER_IMAGE,
+            "python",
+            "/code/submission.py",
+        ]
+
         start_time = time.perf_counter()
 
-        process = subprocess.run(
-            [sys.executable, file_path],
-            input=input_data,
-            text=True,
-            capture_output=True,
-            timeout=time_limit
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
         )
+
+        try:
+            stdout, stderr = process.communicate(
+                input=input_data,
+                timeout=time_limit
+            )
+
+        except subprocess.TimeoutExpired:
+            process.kill()
+
+            try:
+                process.communicate(timeout=2)
+            except subprocess.TimeoutExpired:
+                pass
+
+            subprocess.run(
+                ["docker", "rm", "-f", container_name],
+                capture_output=True,
+                text=True
+            )
+
+            
+            execution_time = time.perf_counter() - start_time
+
+            return {
+                "status": "Time Limit Exceeded",
+                "output": "",
+                "execution_time": execution_time,
+                "error_message": "The program exceeded the time limit."
+            }
 
         execution_time = time.perf_counter() - start_time
 
-        output = process.stdout.strip()
-        error = process.stderr.strip()
+        output = stdout.strip()
+        error = stderr.strip()
 
         if process.returncode != 0:
             return {
@@ -59,12 +127,12 @@ def run_python_code(code, input_data, time_limit=3):
             "error_message": None
         }
 
-    except subprocess.TimeoutExpired:
+    except FileNotFoundError:
         return {
-            "status": "Time Limit Exceeded",
+            "status": "Execution Error",
             "output": "",
-            "execution_time": time_limit,
-            "error_message": "The program exceeded the time limit."
+            "execution_time": 0,
+            "error_message": "Docker CLI was not found."
         }
 
     except Exception as error:
@@ -76,5 +144,6 @@ def run_python_code(code, input_data, time_limit=3):
         }
 
     finally:
+        
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
